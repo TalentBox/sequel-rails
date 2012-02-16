@@ -2,7 +2,7 @@
 namespace :db do
   namespace :schema do
     desc "Create a db/schema.rb file that can be portably used against any DB supported by Sequel"
-    task :dump do
+    task :dump => :environment do
       Sequel.extension :schema_dumper
       db = Sequel.connect(::Rails::Sequel.configuration.environment_for(Rails.env))
       File.open(ENV['SCHEMA'] || "#{Rails.root}/db/schema.rb", "w") do |file|
