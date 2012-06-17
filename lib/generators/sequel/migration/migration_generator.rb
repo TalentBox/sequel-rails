@@ -13,14 +13,29 @@ module Sequel
         migration_template "migration.rb", "db/migrate/#{file_name}.rb"
       end
 
+      attr_reader :migration_action, :table_action, :column_action, :use_change
+
       protected
-
-      attr_reader :migration_action
-
       def set_local_assigns!
-        if file_name =~ /^(add|remove|drop)_.*_(?:to|from)_(.*)/
-          @migration_action = $1 == 'add' ? 'add' : 'drop'
-          @table_name       = $2.pluralize
+        if file_name =~ /^(create|drop)_(.*)$/
+          @table_action   = $1
+          @table_name     = $2.pluralize
+          @column_action  = 'add'
+          @use_change     = @table_action == 'create' ? true : false
+        elsif file_name =~ /^(add|drop|remove)_.*_(?:to|from)_(.*)/
+          @table_action   = 'alter'
+          @table_name     = $2.pluralize
+          @column_action  = $1 == 'add' ? 'add' : 'drop'
+          @use_change     = @column_action == 'add' ? true : false
+        else
+          @table_action   = 'alter'
+          if file_name =~ /^(alter)_(.*)/
+            @table_name   = $2.pluralize
+          else
+            @table_name   = file_name.pluralize
+          end
+          @use_change     = false
+          @column_action  = 'add'
         end
       end
 
