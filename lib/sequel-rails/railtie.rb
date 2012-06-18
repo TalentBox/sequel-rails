@@ -12,8 +12,8 @@ require 'active_model/railtie'
 require 'action_controller/railtie'
 
 require 'sequel-rails/setup'
-require "sequel-rails/railties/log_subscriber"
-require "sequel-rails/railties/i18n_support"
+require 'sequel-rails/railties/log_subscriber'
+require 'sequel-rails/railties/i18n_support'
 
 
 module Rails
@@ -25,6 +25,12 @@ module Rails
 
       config.app_generators.orm :sequel, :migration => true
       config.rails_fancy_pants_logging = true
+
+      config.action_dispatch.rescue_responses.merge!(
+        'Sequel::Plugins::RailsExtensions::ModelNotFound' => :not_found,
+        'Sequel::ValidationFailed'                        => :unprocessable_entity,
+        'Sequel::NoExistingObject'                        => :unprocessable_entity
+      )
 
       rake_tasks do
         load 'sequel-rails/railties/database.rake'
@@ -43,28 +49,25 @@ module Rails
       end
 
       # Expose database runtime to controller for logging.
-      initializer "sequel.log_runtime" do |app|
+      initializer 'sequel.log_runtime' do |app|
         setup_controller_runtime(app)
       end
 
-      initializer "sequel.connect" do |app|
+      initializer 'sequel.connect' do |app|
         Rails::Sequel.setup(Rails.env)
       end
 
       # Run setup code after_initialize to make sure all config/initializers
       # are in effect once we setup the connection. This is especially necessary
       # for the cascaded adapter wrappers that need to be declared before setup.
-
       config.after_initialize do |app|
         ::Sequel::Model.plugin :active_model
         ::Sequel::Model.plugin :validation_helpers
-
+        ::Sequel::Model.plugin :rails_extensions
         ::Sequel::Model.raise_on_save_failure = false
       end
 
-
       # Support overwriting crucial steps in subclasses
-
       def configure_sequel(app)
         app.config.sequel = Rails::Sequel::Configuration.for(
           Rails.root, app.config.database_configuration
@@ -76,7 +79,7 @@ module Rails
       end
 
       def setup_controller_runtime(app)
-        require "sequel-rails/railties/controller_runtime"
+        require 'sequel-rails/railties/controller_runtime'
         ActionController::Base.send :include, Rails::Sequel::Railties::ControllerRuntime
       end
 

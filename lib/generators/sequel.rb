@@ -38,7 +38,7 @@ module Sequel
       end
 
       def self.find(klass, params=nil)
-        "#{klass}[#{params}]"
+        "#{klass}.find!(#{params})"
       end
 
       def self.build(klass, params=nil)
