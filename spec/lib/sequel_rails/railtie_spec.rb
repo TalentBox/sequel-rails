@@ -72,9 +72,6 @@ describe SequelRails::Railtie do
     it "to use :rails_extensions plugin" do
       plugins.should include Sequel::Plugins::RailsExtensions
     end
-    it "to not raise on save failure" do
-      Sequel::Model.raise_on_save_failure.should be false
-    end
   end
 
   it "configures database in Sequel" do
