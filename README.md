@@ -127,7 +127,7 @@ Improvements has been made by those awesome contributors:
 Credits
 =======
 
-The [dm-rails](http://github.com/datamapper/dm-rails) team wrote most of the original code, I just sequel-ized it, but since then most of it as been either adapter or rewritten.
+The [dm-rails](http://github.com/datamapper/dm-rails) team wrote most of the original code, I just sequel-ized it, but since then most of it as been either adapted or rewritten.
 
 Copyright
 =========
