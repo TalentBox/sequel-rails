@@ -64,6 +64,8 @@ module SequelRails
 
     def self.lookup_class(adapter)
       raise "Adapter not specified in config, please set the :adapter key." unless adapter
+      return Jdbc if adapter =~ /jdbc/
+
       klass_name = adapter.camelize.to_sym
       unless self.const_defined?(klass_name)
         raise "Adapter #{adapter} not supported (#{klass_name.inspect})"

@@ -5,7 +5,12 @@ module SequelRails
   mattr_accessor :configuration
 
   def self.setup(environment)
-    ::Sequel.connect configuration.environment_for environment.to_s
+    config = configuration.environment_for(environment.to_s)
+    if config['url']
+      ::Sequel.connect config['url'], config
+    else
+      ::Sequel.connect config
+    end
   end
 
   class Configuration
@@ -23,7 +28,7 @@ module SequelRails
     end
 
     def environments
-      @environments ||= @raw.inject({}) do |normalized, environment|
+      @environments ||= raw.inject({}) do |normalized, environment|
         name, config = environment.first, environment.last
         normalized[name] = normalize_repository_config(config)
         normalized
@@ -55,7 +60,30 @@ module SequelRails
             value
           end
       end
-      
+
+      # always use jdbc when running jruby
+      if ENV['RUBY_VERSION'].to_s =~ /jruby/
+        if config['adapter']
+          case config['adapter'].to_sym
+            when :postgres
+              config['adapter'] = :postgresql
+          end
+          config['adapter'] = "jdbc:#{config['adapter']}"
+        end
+      end
+
+      # some adapters only support an url
+      if config['adapter'] && config['adapter'] =~ /^(jdbc|do):/
+        params = {}
+        config.each do |k, v|
+          next if ['adapter', 'host', 'port', 'database'].include?(k)
+          params[k] = v
+        end
+        params_str = params.map { |k, v| "#{k}=#{v}" }.join('&')
+        port = config['port'] ? ":#{config['port']}" : ''
+        config['url'] = "%s://%s%s/%s?%s" % [config['adapter'], config['host'], port, config['database'], params_str]
+      end
+
       config
     end
 
