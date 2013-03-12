@@ -6,7 +6,7 @@ module SequelRails
     @using_jruby ||= if defined?(RUBY_ENGINE)
       RUBY_ENGINE == "jruby"
     else
-      ENV['RUBY_VERSION'].to_s =~ /jruby/
+      defined?(JRUBY_VERSION)
     end
   end
 end
