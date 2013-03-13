@@ -13,7 +13,7 @@ module SequelRails
     end
   end
 
-  class Configuration
+  class Configuration < ActiveSupport::OrderedOptions
 
     def self.for(root, database_yml_hash)
       ::SequelRails.configuration ||= new(root, database_yml_hash)

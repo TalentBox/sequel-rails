@@ -38,6 +38,51 @@ namespace :db do
     end
   end
 
+  namespace :structure do
+    desc "Dump the database structure to db/structure.sql. Specify another file with DB_STRUCTURE=db/my_structure.sql"
+    task :dump, [:env] => :environment do |t, args|
+      args.with_defaults(:env => Rails.env)
+      
+      filename = ENV['DB_STRUCTURE'] || File.join(Rails.root, "db", "structure.sql")
+      unless SequelRails::Storage.dump_environment args.env, filename
+        abort "Could not dump structure for #{args.env}."
+      end
+      
+      Rake::Task["db:structure:dump"].reenable
+    end
+
+    task :load, [:env] => :environment do |t, args|
+      args.with_defaults(:env => Rails.env)
+      
+      filename = ENV['DB_STRUCTURE'] || File.join(Rails.root, "db", "structure.sql")
+      unless SequelRails::Storage.load_environment args.env, filename
+        abort "Could not load structure for #{args.env}."
+      end
+    end
+  end
+  
+  task dump: :environment do
+    case (SequelRails.configuration.schema_format ||= :ruby)
+    when :ruby
+      Rake::Task["db:schema:dump"].invoke
+    when :sql
+      Rake::Task["db:structure:dump"].invoke
+    else
+      abort "unknown schema format #{SequelRails.configuration.schema_format}"
+    end
+  end
+  
+  task load: :environment do
+    case (SequelRails.configuration.schema_format ||= :ruby)
+    when :ruby
+      Rake::Task["db:schema:load"].invoke
+    when :sql
+      Rake::Task["db:structure:load"].invoke
+    else
+      abort "unknown schema format #{SequelRails.configuration.schema_format}"
+    end
+  end
+  
   namespace :create do
     desc 'Create all the local databases defined in config/database.yml'
     task :all => :environment do
@@ -98,7 +143,7 @@ namespace :db do
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
       SequelRails::Migrations.migrate_up!(version)
-      Rake::Task["db:schema:dump"].invoke unless Rails.env.test?
+      Rake::Task["db:dump"].invoke unless Rails.env.test?
     end
 
     desc 'Runs the "down" for a given migration VERSION.'
@@ -106,14 +151,14 @@ namespace :db do
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
       SequelRails::Migrations.migrate_down!(version)
-      Rake::Task["db:schema:dump"].invoke unless Rails.env.test?
+      Rake::Task["db:dump"].invoke unless Rails.env.test?
     end
   end
 
   desc 'Migrate the database to the latest version'
   task :migrate => "migrate:load" do
     SequelRails::Migrations.migrate_up!(ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
-    Rake::Task["db:schema:dump"].invoke unless Rails.env.test?
+    Rake::Task["db:dump"].invoke unless Rails.env.test?
   end
 
   desc 'Load the seed data from db/seeds.rb'
@@ -123,7 +168,7 @@ namespace :db do
   end
 
   desc 'Create the database, load the schema, and initialize with the seed data'
-  task :setup => [ 'db:create', 'db:schema:load', 'db:seed' ]
+  task :setup => [ 'db:create', 'db:load', 'db:seed' ]
 
   desc 'Drops and recreates the database from db/schema.rb for the current environment and loads the seeds.'
   task :reset => [ 'db:drop', 'db:setup' ]
@@ -140,7 +185,7 @@ namespace :db do
       previous_env, Rails.env = Rails.env, 'test'
       Rake::Task['db:drop'].execute
       Rake::Task['db:create'].execute
-      Rake::Task['db:schema:load'].execute
+      Rake::Task['db:load'].execute
       Sequel::DATABASES.each do |db|
         db.disconnect
       end

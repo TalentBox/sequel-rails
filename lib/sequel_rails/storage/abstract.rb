@@ -21,6 +21,18 @@ module SequelRails
         res
       end
 
+      def dump filename
+        res = _dump filename
+        puts "[sequel] Dumped structure of database '#{database}' to '#{filename}'" if res
+        res
+      end
+
+      def load filename
+        res = _load filename
+        puts "[sequel] Loaded structure of database '#{database}' from '#{filename}'" if res
+        res
+      end
+
       # To be overriden by subclasses
       def close_connections
         true

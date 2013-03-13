@@ -32,6 +32,8 @@ module SequelRails
       "Sequel::ValidationFailed" => :unprocessable_entity,
       "Sequel::NoExistingObject" => :unprocessable_entity
     )
+    
+    config.sequel = ActiveSupport::OrderedOptions.new
 
     rake_tasks do
       load "sequel_rails/railties/database.rake"
@@ -62,7 +64,7 @@ module SequelRails
     def configure_sequel(app)
       app.config.sequel = ::SequelRails::Configuration.for(
         ::Rails.root, app.config.database_configuration
-      )
+      ).merge!(app.config.sequel)
     end
 
     def setup_i18n_support(app)
