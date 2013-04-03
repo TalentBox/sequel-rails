@@ -11,7 +11,7 @@ describe SequelRails::Migrations do
         let(:opts) { {} }
         it "runs migrations using Sequel::Migrator" do
           ::Sequel::Migrator.should_receive(:run).with(
-            db, "db/migrate", opts
+            db, Rails.root.join("db/migrate"), opts
           ).and_return result
           described_class.send(migration_method).should be result
         end
@@ -20,7 +20,7 @@ describe SequelRails::Migrations do
         let(:opts) { {:target => 1} }
         it "runs migrations using Sequel::Migrator" do
           ::Sequel::Migrator.should_receive(:run).with(
-            db, "db/migrate", opts
+            db, Rails.root.join("db/migrate"), opts
           ).and_return result
           described_class.send(migration_method, 1).should be result
         end
@@ -30,7 +30,7 @@ describe SequelRails::Migrations do
 
   describe ".pending_migrations?" do
     include FakeFS::SpecHelpers
-    let(:path) { "db/migrate" }
+    let(:path) { Rails.root.join("db/migrate") }
 
     it "returns false if no db/migrate directory exists" do
       described_class.pending_migrations?.should == false
@@ -41,14 +41,14 @@ describe SequelRails::Migrations do
 
       it "returns true if any pending migration" do
         ::Sequel::Migrator.should_receive(:is_current?).with(
-          db, "db/migrate"
+          db, Rails.root.join("db/migrate")
         ).and_return false
         described_class.pending_migrations?.should == true
       end
 
       it "returns false if no pending migration" do
         ::Sequel::Migrator.should_receive(:is_current?).with(
-          db, "db/migrate"
+          db, Rails.root.join("db/migrate")
         ).and_return true
         described_class.pending_migrations?.should == false
       end
