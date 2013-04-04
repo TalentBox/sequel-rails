@@ -72,6 +72,9 @@ module SequelRails
         end
       end
 
+      # override max connections if requested in app configuration
+      config['max_connections'] = max_connections if max_connections
+      
       # some adapters only support an url
       if config['adapter'] && config['adapter'] =~ /^(jdbc|do):/
         params = {}

@@ -41,12 +41,46 @@ describe SequelRails::Configuration do
   subject { SequelRails.setup(environment) }
 
   describe ".setup" do
+    
+    shared_context "max_connections" do
+      let(:max_connections) { 31337 }
+      before do
+        environments[environment]["max_connections"] = 7
+        SequelRails.configuration.max_connections = max_connections
+      end
+    end
+    
+    shared_examples "max_connections_c" do
+      context "with max_connections config option" do
+        include_context "max_connections"
+        it "overrides the option from the configuration" do
+          ::Sequel.should_receive(:connect) do |hash|
+              hash['max_connections'].should == max_connections
+          end
+          subject
+        end
+      end
+    end
+
+    shared_examples "max_connections_j" do
+      context "with max_connections config option" do
+        include_context "max_connections"
+        it "overrides the option from the configuration" do
+          ::Sequel.should_receive(:connect) do |url, hash|
+            url.should include("max_connections=#{max_connections}")
+          end
+          subject
+        end
+      end
+    end
 
     context "for a postgres connection" do
-
+      
       let(:environment) { 'development' }
 
       context "in C-Ruby" do
+        
+        include_examples "max_connections_c"
 
         it "produces a sane config without url" do
           ::Sequel.should_receive(:connect) do |hash|
@@ -54,9 +88,12 @@ describe SequelRails::Configuration do
           end
           subject
         end
+        
       end
 
       context "in JRuby" do
+        
+        include_examples "max_connections_j"
 
         let(:is_jruby) { true }
 
@@ -72,10 +109,12 @@ describe SequelRails::Configuration do
     end
 
     context "for a mysql connection" do
-
+        
       let(:environment) { 'remote' }
 
       context "in C-Ruby" do
+
+        include_examples "max_connections_c"
 
         it "produces a config without url" do
           ::Sequel.should_receive(:connect) do |hash|
@@ -86,6 +125,8 @@ describe SequelRails::Configuration do
       end
 
       context "in JRuby" do
+        
+        include_examples "max_connections_j"
 
         let(:is_jruby) { true }
 
