@@ -11,6 +11,26 @@ module SequelRails
         execute("DROP DATABASE IF EXISTS `#{database}`")
       end
 
+      def _dump filename
+        commands = %w(mysqldump --no-data)
+        commands << "--user=#{Shellwords.escape(username)}" unless username.blank?
+        commands << "--password=#{Shellwords.escape(password)}" unless password.blank?
+        commands << "--host=#{host}" unless host.blank?
+        commands << "--result-file" << filename
+        commands << database
+        system(*commands)
+      end
+
+      def _load filename
+        commands = %w(mysql)
+        commands << "--user=#{Shellwords.escape(username)}" unless username.blank?
+        commands << "--password=#{Shellwords.escape(password)}" unless password.blank?
+        commands << "--host=#{host}" unless host.blank?
+        commands << '--execute' << %{SET FOREIGN_KEY_CHECKS = 0; SOURCE #{filename}; SET FOREIGN_KEY_CHECKS = 1}
+        commands << '--database' << database
+        system(*commands)
+      end
+
       private
 
       def execute(statement)
