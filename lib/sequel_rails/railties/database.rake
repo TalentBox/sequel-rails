@@ -18,7 +18,7 @@ namespace :db do
   namespace :schema do
     desc "Create a db/schema.rb file that can be portably used against any DB supported by Sequel"
     task :dump => :environment do
-      ::Sequel.extension :schema_dumper
+      db_for_current_env.extension :schema_dumper
       File.open(ENV['SCHEMA'] || "#{Rails.root}/db/schema.rb", "w") do |file|
         file.write db_for_current_env.dump_schema_migration(:same_db => true)
       end
