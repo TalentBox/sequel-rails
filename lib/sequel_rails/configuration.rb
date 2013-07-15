@@ -75,12 +75,17 @@ module SequelRails
 
       # override max connections if requested in app configuration
       config['max_connections'] = max_connections if max_connections
+      config['search_path'] = search_path if search_path
 
       # some adapters only support an url
       if config['adapter'] && config['adapter'] =~ /^(jdbc|do):/
         params = {}
         config.each do |k, v|
           next if ['adapter', 'host', 'port', 'database'].include?(k)
+          if k == 'search_path'
+            v = v.split(',').map &:strip unless v.is_a? Array
+            v = URI::escape(v.join(','))
+          end
           params[k] = v
         end
         params_str = params.map { |k, v| "#{k}=#{v}" }.join('&')

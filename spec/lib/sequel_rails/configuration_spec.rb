@@ -42,32 +42,21 @@ describe SequelRails::Configuration do
 
   describe ".setup" do
     
-    shared_context "max_connections" do
-      let(:max_connections) { 31337 }
-      before do
-        environments[environment]["max_connections"] = 7
-        SequelRails.configuration.max_connections = max_connections
-      end
-    end
-    
-    shared_examples "max_connections_c" do
+    shared_examples "max_connections" do
       context "with max_connections config option" do
-        include_context "max_connections"
-        it "overrides the option from the configuration" do
-          ::Sequel.should_receive(:connect) do |hash|
-              hash['max_connections'].should == max_connections
-          end
-          subject
+        let(:max_connections) { 31337 }
+        before do
+          environments[environment]["max_connections"] = 7
+          SequelRails.configuration.max_connections = max_connections
         end
-      end
-    end
 
-    shared_examples "max_connections_j" do
-      context "with max_connections config option" do
-        include_context "max_connections"
         it "overrides the option from the configuration" do
-          ::Sequel.should_receive(:connect) do |url, hash|
-            url.should include("max_connections=#{max_connections}")
+          ::Sequel.should_receive(:connect) do |hash_or_url, *_|
+            if hash_or_url.is_a? Hash
+              hash_or_url['max_connections'].should == max_connections
+            else
+              hash_or_url.should include("max_connections=#{max_connections}")
+            end
           end
           subject
         end
@@ -76,11 +65,33 @@ describe SequelRails::Configuration do
 
     context "for a postgres connection" do
       
+      shared_examples "search_path" do
+        context "with search_path config option" do
+          let(:search_path) { ['secret', 'private', 'public'] }
+          before do
+            environments[environment]["search_path"] = "private, public"
+            SequelRails.configuration.search_path = search_path
+          end
+
+          it "overrides the option from the configuration" do
+            ::Sequel.should_receive(:connect) do |hash_or_url, *_|
+              if hash_or_url.is_a? Hash
+                hash_or_url['search_path'].should == search_path
+              else
+                hash_or_url.should include("search_path=secret,private,public")
+              end
+            end
+            subject
+          end
+        end
+      end
+
       let(:environment) { 'development' }
 
       context "in C-Ruby" do
         
-        include_examples "max_connections_c"
+        include_examples "max_connections"
+        include_examples "search_path"
 
         it "produces a sane config without url" do
           ::Sequel.should_receive(:connect) do |hash|
@@ -93,7 +104,8 @@ describe SequelRails::Configuration do
 
       context "in JRuby" do
         
-        include_examples "max_connections_j"
+        include_examples "max_connections"
+        include_examples "search_path"
 
         let(:is_jruby) { true }
 
@@ -114,7 +126,7 @@ describe SequelRails::Configuration do
 
       context "in C-Ruby" do
 
-        include_examples "max_connections_c"
+        include_examples "max_connections"
 
         it "produces a config without url" do
           ::Sequel.should_receive(:connect) do |hash|
@@ -126,7 +138,7 @@ describe SequelRails::Configuration do
 
       context "in JRuby" do
         
-        include_examples "max_connections_j"
+        include_examples "max_connections"
 
         let(:is_jruby) { true }
 
