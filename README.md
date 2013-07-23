@@ -52,6 +52,24 @@ require "sequel_rails/railties/legacy_model_config"
 
 After those changes, you should be good to go!
 
+Configuration
+====================================
+You can configure some options with the usual rails mechanism, in
+`config/application.rb` and/or in `config/environments/*.rb`.
+
+```ruby
+    # Allowed options: :sql, :ruby.
+    config.sequel.schema_format = :sql
+
+    # Whether to dump the schema after successful migrations.
+    # Defaults to false in production and test, true otherwise.
+    config.sequel.schema_dump = true
+
+    # These override corresponding settings from the database config.
+    config.sequel.max_connections = 16
+    config.sequel.search_path = %w(mine public)
+```
+
 Available sequel specific rake tasks
 ====================================
 

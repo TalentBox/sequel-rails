@@ -35,7 +35,15 @@ module SequelRails
       end
     end
 
+    def schema_dump
+      super.nil? ? (schema_dump = default_schema_dump) : super
+    end
+
   private
+
+    def default_schema_dump
+      not %w(test production).include? Rails.env
+    end
 
     def initialize(root, database_yml_hash)
       super()
