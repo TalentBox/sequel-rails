@@ -15,7 +15,7 @@ module SequelRails
       end
 
       def _root_url
-        config['url'].scan(/^jdbc:mysql:\/\/\w*:?\d*/).first
+        config['url'].scan(/^jdbc:mysql:\/\/[\w\.]*:?\d*/).first
       end
 
       def db_name
