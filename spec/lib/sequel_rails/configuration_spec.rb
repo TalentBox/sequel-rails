@@ -2,46 +2,46 @@ require "spec_helper"
 
 describe SequelRails::Configuration do
 
-  let(:environments) do
-    {
-      "development" => {
-        "adapter" => "postgres",
-        "owner" => (ENV["TEST_OWNER"] || ENV["USER"]),
-        "username" => (ENV["TEST_OWNER"] || ENV["USER"]),
-        "database" => "sequel_rails_test_storage_dev",
-        "host" => "127.0.0.1",
-      },
-      "test" => {
-        "adapter" => "postgres",
-        "owner" => (ENV["TEST_OWNER"] || ENV["USER"]),
-        "username" => (ENV["TEST_OWNER"] || ENV["USER"]),
-        "database" => "sequel_rails_test_storage_test",
-        "host" => "127.0.0.1",
-      },
-      "remote" => {
-        "adapter" => "mysql",
-        "host" => "10.0.0.1",
-        "database" => "sequel_rails_test_storage_remote",
-      },
-      "production" => {
-        "host" => "10.0.0.1",
-        "database" => "sequel_rails_test_storage_production",
-      },
-      "bogus" => {},
-    }
-  end
-  let(:is_jruby) { false }
-
-  before do
-    SequelRails.configuration.stub(:raw).and_return environments
-    SequelRails.configuration.instance_variable_set('@environments', nil)
-    SequelRails.stub(:jruby?).and_return is_jruby
-  end
-
-  subject { SequelRails.setup(environment) }
-
   describe ".setup" do
-    
+
+    let(:environments) do
+      {
+        "development" => {
+          "adapter" => "postgres",
+          "owner" => (ENV["TEST_OWNER"] || ENV["USER"]),
+          "username" => (ENV["TEST_OWNER"] || ENV["USER"]),
+          "database" => "sequel_rails_test_storage_dev",
+          "host" => "127.0.0.1",
+        },
+        "test" => {
+          "adapter" => "postgres",
+          "owner" => (ENV["TEST_OWNER"] || ENV["USER"]),
+          "username" => (ENV["TEST_OWNER"] || ENV["USER"]),
+          "database" => "sequel_rails_test_storage_test",
+          "host" => "127.0.0.1",
+        },
+        "remote" => {
+          "adapter" => "mysql",
+          "host" => "10.0.0.1",
+          "database" => "sequel_rails_test_storage_remote",
+        },
+        "production" => {
+          "host" => "10.0.0.1",
+          "database" => "sequel_rails_test_storage_production",
+        },
+        "bogus" => {},
+      }
+    end
+    let(:is_jruby) { false }
+
+    before do
+      SequelRails.configuration.stub(:raw).and_return environments
+      SequelRails.configuration.instance_variable_set('@environments', nil)
+      SequelRails.stub(:jruby?).and_return is_jruby
+    end
+
+    subject { SequelRails.setup(environment) }
+
     shared_examples "max_connections" do
       context "with max_connections config option" do
         let(:max_connections) { 31337 }
@@ -64,7 +64,7 @@ describe SequelRails::Configuration do
     end
 
     context "for a postgres connection" do
-      
+
       shared_examples "search_path" do
         context "with search_path config option" do
           let(:search_path) { ['secret', 'private', 'public'] }
@@ -89,7 +89,7 @@ describe SequelRails::Configuration do
       let(:environment) { 'development' }
 
       context "in C-Ruby" do
-        
+
         include_examples "max_connections"
         include_examples "search_path"
 
@@ -99,11 +99,11 @@ describe SequelRails::Configuration do
           end
           subject
         end
-        
+
       end
 
       context "in JRuby" do
-        
+
         include_examples "max_connections"
         include_examples "search_path"
 
@@ -121,7 +121,7 @@ describe SequelRails::Configuration do
     end
 
     context "for a mysql connection" do
-        
+
       let(:environment) { 'remote' }
 
       context "in C-Ruby" do
@@ -137,7 +137,7 @@ describe SequelRails::Configuration do
       end
 
       context "in JRuby" do
-        
+
         include_examples "max_connections"
 
         let(:is_jruby) { true }
@@ -151,6 +151,72 @@ describe SequelRails::Configuration do
           subject
         end
       end
+    end
+  end
+
+  describe "#schema_dump" do
+    before{ Rails.stub(:env).and_return environment }
+    subject { SequelRails::Configuration.new("path/to/app", {}) }
+
+    context "in test environment" do
+      let(:environment) { "test" }
+      it "defaults to false" do
+        subject.schema_dump.should be_false
+      end
+      it "can be assigned" do
+        subject.schema_dump = true
+        subject.schema_dump.should be_true
+      end
+      it "can be set from merging another hash" do
+        subject.merge!(:schema_dump => true)
+        subject.schema_dump.should be_true
+      end
+    end
+
+    context "in production environment" do
+      let(:environment) { "production" }
+      it "defaults to false" do
+        subject.schema_dump.should be_false
+      end
+      it "can be assigned" do
+        subject.schema_dump = true
+        subject.schema_dump.should be_true
+      end
+      it "can be set from merging another hash" do
+        subject.merge!(:schema_dump => true)
+        subject.schema_dump.should be_true
+      end
+    end
+
+    context "in other environments" do
+      let(:environment) { "development" }
+      it "defaults to true" do
+        subject.schema_dump.should be_true
+      end
+      it "can be assigned" do
+        subject.schema_dump = false
+        subject.schema_dump.should be_false
+      end
+      it "can be set from merging another hash" do
+        subject.merge!(:schema_dump => false)
+        subject.schema_dump.should be_false
+      end
+    end
+  end
+
+  describe "#load_database_tasks" do
+    subject { SequelRails::Configuration.new("path/to/app", {}) }
+
+    it "defaults to true" do
+      subject.load_database_tasks.should be_true
+    end
+    it "can be assigned" do
+      subject.load_database_tasks = false
+      subject.load_database_tasks.should be_false
+    end
+    it "can be set from merging another hash" do
+      subject.merge!(:load_database_tasks => false)
+      subject.load_database_tasks.should be_false
     end
   end
 end

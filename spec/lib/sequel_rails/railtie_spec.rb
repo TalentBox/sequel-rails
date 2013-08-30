@@ -45,10 +45,6 @@ describe SequelRails::Railtie do
     end
   end
 
-  it "adds it's own database's rake tasks" do
-    pending "need to find a way to spec it"
-  end
-
   it "stores it's own config in app.config.sequel" do
     app.config.sequel.should be_instance_of SequelRails::Configuration
   end

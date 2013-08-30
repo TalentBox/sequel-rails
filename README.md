@@ -68,6 +68,10 @@ You can configure some options with the usual rails mechanism, in
     # These override corresponding settings from the database config.
     config.sequel.max_connections = 16
     config.sequel.search_path = %w(mine public)
+
+    # Configure whether database's rake tasks will be loaded or not
+    # Defaults to true
+    config.sequel.load_database_tasks = false
 ```
 
 Available sequel specific rake tasks

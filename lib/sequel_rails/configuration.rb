@@ -23,6 +23,11 @@ module SequelRails
     attr_accessor :logger
     attr_accessor :migration_dir
 
+    def initialize(root, database_yml_hash)
+      super()
+      @root, @raw = root, database_yml_hash
+    end
+
     def environment_for(name)
       environments[name.to_s] || environments[name.to_sym]
     end
@@ -39,15 +44,14 @@ module SequelRails
       super.nil? ? (schema_dump = default_schema_dump) : super
     end
 
+    def load_database_tasks
+      super.nil? ? (load_database_tasks = true) : super
+    end
+
   private
 
     def default_schema_dump
       not %w(test production).include? Rails.env
-    end
-
-    def initialize(root, database_yml_hash)
-      super()
-      @root, @raw = root, database_yml_hash
     end
 
     def normalize_repository_config(hash)
