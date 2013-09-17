@@ -60,7 +60,7 @@ module SequelRails
     end
 
     initializer 'sequel.connect' do |app|
-      ::SequelRails.setup ::Rails.env
+      ::SequelRails.setup ::Rails.env, app
     end
 
     # Support overwriting crucial steps in subclasses

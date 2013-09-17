@@ -4,13 +4,18 @@ module SequelRails
 
   mattr_accessor :configuration
 
-  def self.setup(environment)
+  def self.setup(environment, app)
     config = configuration.environment_for(environment.to_s)
-    if config['url']
+    db = if config['url']
       ::Sequel.connect config['url'], config
     else
       ::Sequel.connect config
     end
+
+    callback = app.config.sequel.after_connect
+    callback.call if callback.respond_to?(:call)
+
+    db
   end
 
   class Configuration < ActiveSupport::OrderedOptions

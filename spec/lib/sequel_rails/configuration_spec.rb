@@ -45,7 +45,21 @@ describe SequelRails::Configuration do
       SequelRails.stub(:jruby?).and_return is_jruby
     end
 
-    subject { SequelRails.setup(environment) }
+    let(:sequel_config) { OpenStruct.new }
+    let(:app_config) { OpenStruct.new(sequel: sequel_config) }
+    let(:app) { OpenStruct.new(config: app_config) }
+    subject { SequelRails.setup(environment, app) }
+
+    context "after_connect hook" do
+      let(:environment) { 'development' }
+      let(:hook) { double }
+      let(:sequel_config) { OpenStruct.new(after_connect: hook) }
+
+      it "runs hook if provided" do
+        hook.should_receive(:call)
+        subject
+      end
+    end
 
     shared_examples "max_connections" do
       context "with max_connections config option" do

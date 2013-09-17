@@ -74,6 +74,23 @@ You can configure some options with the usual rails mechanism, in
     config.sequel.load_database_tasks = false
 ```
 
+Enabling plugins
+================
+
+If you want to enable plugins for all your models, you should use the
+after_connect configuration option in `config/application.rb` (0.6.2+):
+
+```ruby
+    config.sequel.after_connect = proc do
+      Sequel::Model.plugin :timestamps, update_on_create: true
+    end
+```
+
+This will ensure that these plugins are loaded before any Sequel models are
+loaded. Loading plugins into `Sequel::Model` after subclasses are already
+created is not supported by Sequel. You can also load extensions in
+`after_connect` or perform any custom actions that you need.
+
 Available sequel specific rake tasks
 ====================================
 
