@@ -33,7 +33,7 @@ namespace :db do
       if File.exists?(file)
         require 'sequel/extensions/migration'
         load(file)
-        ::Sequel::Migration.descendants.first.apply(db_for_current_env, :up)
+        ::Sequel::Migration.descendants.each{|m| m.apply(db_for_current_env, :up)}
       else
         abort %{#{file} doesn't exist yet. Run "rake db:migrate" to create it then try again. If you do not intend to use a database, you should instead alter #{Rails.root}/config/boot.rb to limit the frameworks that will be loaded}
       end
