@@ -25,7 +25,7 @@ module SequelRails
 
         inserts = migrator.ds.map do |hash|
           insert = migrator.ds.insert_sql(hash)
-          sql ? insert : "    self << #{insert.inspect}"
+          sql ? "#{insert};" : "    self << #{insert.inspect}"
         end
         res = ""
         if inserts.any?
