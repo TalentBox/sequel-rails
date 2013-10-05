@@ -35,7 +35,7 @@ module SequelRails
             db.execute("CREATE DATABASE IF NOT EXISTS `#{db_name}` DEFAULT CHARACTER SET #{charset} DEFAULT COLLATE #{collation}")
           end
         elsif _is_postgres?
-          system("createdb #{db_name}")
+          Postgres.new(config)._create
         end
       end
 
@@ -48,7 +48,7 @@ module SequelRails
             db.execute("DROP DATABASE IF EXISTS `#{db_name}`")
           end
         elsif _is_postgres?
-          system("dropdb #{db_name}")
+          Postgres.new(config)._drop
         end
       end
 
