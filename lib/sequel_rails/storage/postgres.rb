@@ -9,7 +9,7 @@ module SequelRails
         commands << "--port" << port.to_s unless port.blank?
         commands << "--host" << host unless host.blank?
         commands << database
-        res = system(*commands)
+        res = safe_exec(commands)
         ENV["PGPASSWORD"] = nil unless password.blank?
         res
       end
@@ -21,7 +21,7 @@ module SequelRails
         commands << "--port" << port.to_s unless port.blank?
         commands << "--host" << host unless host.blank?
         commands << database
-        res = system(*commands)
+        res = safe_exec(commands)
         ENV["PGPASSWORD"] = nil unless password.blank?
         res
       end
@@ -34,7 +34,7 @@ module SequelRails
         commands << "--port" << port.to_s unless port.blank?
         commands << "--host" << host unless host.blank?
         commands << database
-        res = system(*commands)
+        res = safe_exec(commands)
         ENV["PGPASSWORD"] = nil unless password.blank?
         res
       end
@@ -47,7 +47,7 @@ module SequelRails
         commands << "--port" << port.to_s unless port.blank?
         commands << "--host" << host unless host.blank?
         commands << database
-        res = system(*commands)
+        res = safe_exec(commands)
         ENV["PGPASSWORD"] = nil unless password.blank?
         res
       end
@@ -66,6 +66,19 @@ module SequelRails
           # Will raise an error as it kills existing process running this
           # command. Seems to be only way to ensure *all* test connections
           # are closed
+        end
+      end
+
+      def safe_exec(args)
+        begin
+          require 'shellwords'
+
+          `#{Shellwords.join(args)}`
+
+          # Evaluate command status as a boolean like `system` does.
+          $?.exitstatus == 0
+        rescue LoadError
+          system(args)
         end
       end
     end

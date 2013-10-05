@@ -35,7 +35,8 @@ module SequelRails
             db.execute("CREATE DATABASE IF NOT EXISTS `#{db_name}` DEFAULT CHARACTER SET #{charset} DEFAULT COLLATE #{collation}")
           end
         elsif _is_postgres?
-          system("createdb #{db_name}")
+          adapter = ::SequelRails::Storage::Postgres.new(config)
+          adapter._create
         end
       end
 
@@ -48,7 +49,26 @@ module SequelRails
             db.execute("DROP DATABASE IF EXISTS `#{db_name}`")
           end
         elsif _is_postgres?
-          system("dropdb #{db_name}")
+          adapter = ::SequelRails::Storage::Postgres.new(config)
+          adapter._drop
+        end
+      end
+
+      def _dump(filename)
+        if _is_postgres?
+          adapter = ::SequelRails::Storage::Postgres.new(config)
+          adapter._dump(filename)
+        else
+          raise NotImplementedError
+        end
+      end
+
+      def _load(filename)
+        if _is_postgres?
+          adapter = ::SequelRails::Storage::Postgres.new(config)
+          adapter._load(filename)
+        else
+          raise NotImplementedError
         end
       end
 
