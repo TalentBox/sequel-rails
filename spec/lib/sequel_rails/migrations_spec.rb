@@ -36,8 +36,16 @@ describe SequelRails::Migrations do
       described_class.pending_migrations?.should == false
     end
 
-    context "when db/migrate directory exists" do
-      before { FileUtils.mkdir_p path }
+    it "returns false if db/migrate directory exists, but is empty" do
+      FileUtils.mkdir_p path
+      described_class.pending_migrations?.should == false
+    end
+
+    context "when db/migrate directory exists and contains migrations" do
+      before do
+        FileUtils.mkdir_p path
+        FileUtils.touch(File.join(path, 'test_migration.rb'))
+      end
 
       it "returns true if any pending migration" do
         ::Sequel::Migrator.should_receive(:is_current?).with(
