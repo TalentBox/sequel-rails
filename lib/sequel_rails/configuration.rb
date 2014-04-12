@@ -1,4 +1,4 @@
-if Gem.loaded_specs['rails'].version.to_s =~ /^4\.1.+/
+if Gem.loaded_specs['rails'] && Gem.loaded_specs['rails'].version.to_s =~ /^4\.1.+/
   require 'active_support/core_ext/module/attribute_accessors'
 else
   require 'active_support/core_ext/class/attribute_accessors'
