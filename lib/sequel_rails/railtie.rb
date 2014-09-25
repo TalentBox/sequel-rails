@@ -17,6 +17,7 @@ require 'sequel_rails/railties/log_subscriber'
 require 'sequel_rails/railties/i18n_support'
 require 'sequel_rails/railties/controller_runtime'
 require 'sequel_rails/sequel/database/active_support_notification'
+require 'sequel_rails/sequel/model'
 require 'action_dispatch/middleware/session/sequel_store'
 
 module SequelRails
