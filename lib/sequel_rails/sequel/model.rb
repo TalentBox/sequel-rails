@@ -1,7 +1,7 @@
 module Sequel
-  self.singleton_class.send(:alias_method, :oldModel, :Model)
+  singleton_class.send(:alias_method, :oldModel, :Model)
   def self.Model(*args)
-    #for backward compatibility -- probably not necessary
+    # for backward compatibility -- probably not necessary
     if args.count == 1
       if (args[0].is_a? String) || (args[0].is_a? Symbol)
         table_name = args[0].to_s
@@ -13,15 +13,13 @@ module Sequel
         return oldModel(args[0])
       end
     end
-    #end backward compatibiility
+    # end backward compatibiility
     settings = nil
     if args[0].is_a? Hash
       settings = args[0]
     else
-      settings = { table: args[0] }
-      if args[1].is_a? Hash
-        settings.merge! args[1]
-      end
+      settings = { :table => args[0] }
+      settings.merge! args[1] if args[1].is_a? Hash
     end
     klass = Class.new(Model)
     klass.preconfig settings
@@ -48,10 +46,10 @@ module Sequel
         prefix = p[:prefix]
         table_name = p[:table].to_s
       end
-      unless dbc.empty? ; dbc << '_' end
+      dbc.empty? || dbc << '_'
       dbconf = dbconfs["#{dbc}#{Rails.env}"]
       prefix = dbconf['prefix'] if prefix.nil?
-      prefix << '_' unless prefix.to_s.empty? 
+      prefix << '_' unless prefix.to_s.empty?
       table_name = subclass.implicit_table_name if table_name.empty?
       table_name = prefix + table_name unless prefix.to_s.empty?
       subclass.db = Sequel.connect(dbconf)
