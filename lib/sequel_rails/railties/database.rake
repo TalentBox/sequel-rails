@@ -9,12 +9,12 @@ namespace sequel_rails_namespace do
     @db_for_current_env[Rails.env] ||= ::SequelRails.setup(Rails.env)
   end
 
-  def run_dump
+  def run_dump(namespace)
     case (SequelRails.configuration.schema_format ||= :ruby)
     when :ruby
-      Rake::Task["#{sequel_rails_namespace}:schema:dump"].invoke
+      Rake::Task["#{namespace}:schema:dump"].invoke
     when :sql
-      Rake::Task["#{sequel_rails_namespace}:structure:dump"].invoke
+      Rake::Task["#{namespace}:structure:dump"].invoke
     else
       abort "unknown schema format #{SequelRails.configuration.schema_format}"
     end
@@ -81,7 +81,7 @@ namespace sequel_rails_namespace do
   end
 
   task :dump => :environment do
-    run_dump
+    run_dump(sequel_rails_namespace)
   end
 
   task :load => :environment do
@@ -151,7 +151,7 @@ namespace sequel_rails_namespace do
       version = ENV['VERSION'] ? ENV['VERSION'].to_i : nil
       fail 'VERSION is required' unless version
       SequelRails::Migrations.migrate_up!(version)
-      run_dump if SequelRails.configuration.schema_dump
+      run_dump(sequel_rails_namespace) if SequelRails.configuration.schema_dump
     end
 
     desc 'Runs the "down" for a given migration VERSION.'
@@ -159,14 +159,14 @@ namespace sequel_rails_namespace do
       version = ENV['VERSION'] ? ENV['VERSION'].to_i : nil
       fail 'VERSION is required' unless version
       SequelRails::Migrations.migrate_down!(version)
-      run_dump if SequelRails.configuration.schema_dump
+      run_dump(sequel_rails_namespace) if SequelRails.configuration.schema_dump
     end
   end
 
   desc 'Migrate the database to the latest version'
   task :migrate => 'migrate:load' do
     SequelRails::Migrations.migrate_up!(ENV['VERSION'] ? ENV['VERSION'].to_i : nil)
-    run_dump if SequelRails.configuration.schema_dump
+    run_dump(sequel_rails_namespace) if SequelRails.configuration.schema_dump
   end
 
   desc 'Rollback the latest migration file or down to specified VERSION=x'
@@ -177,7 +177,7 @@ namespace sequel_rails_namespace do
                 SequelRails::Migrations.previous_migration
               end
     SequelRails::Migrations.migrate_down! version
-    run_dump if SequelRails.configuration.schema_dump
+    run_dump(sequel_rails_namespace) if SequelRails.configuration.schema_dump
   end
 
   desc 'Load the seed data from db/seeds.rb'
