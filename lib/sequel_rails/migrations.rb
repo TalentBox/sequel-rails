@@ -86,7 +86,7 @@ module SequelRails
           end
         end
         if explanation && copy_files.any?
-          puts "Detected migration files outside of the main db/migrate directory. Copying them to db/migrate temporarily to #{explanation}:"
+          puts "SequelRails: Detected migration files outside of the main db/migrate directory. Copying them to db/migrate temporarily to #{explanation}:"
           copy_files.each { |o, _| puts " - #{o}"}
         end
         copy_files.each { |original, destination| FileUtils.cp(original, destination) }
