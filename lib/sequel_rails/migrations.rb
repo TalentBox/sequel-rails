@@ -72,9 +72,10 @@ module SequelRails
         end
       end
 
-      # Temporarily merges the migration files and then moves them back. Sequel's migration class cannot work
-      # with migrations in different directories even if sequel-rails can. This is the simplest solution that works
-      # until ::Sequel::Migrator supports merging of multiple migration directories.
+      # Temporarily merges the migration files by copying them over and then deletes them.
+      # Sequel's migration class cannot work with migrations in different directories even if sequel-rails can.
+      # This is the simplest solution that works until ::Sequel::Migrator supports merging of multiple migration
+      # directories.
       def temporarily_merge_migration_files(explanation=nil)
         copy_files = []
         Rails.application.config.paths["db/migrate"].expanded.each do |specified_migration_dir|
