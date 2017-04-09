@@ -1,8 +1,8 @@
 module SequelRails
   module SpringSupport
-    def disconnect_database_with_sequel
+    def disconnect_database
       Sequel::DATABASES.each(&:disconnect) if sequel_configured?
-      disconnect_database_without_sequel
+      super
     end
 
     private
