@@ -1,3 +1,5 @@
+require 'English'
+
 module SequelRails
   module Storage
     class Abstract
