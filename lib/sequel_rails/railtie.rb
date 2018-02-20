@@ -111,15 +111,17 @@ module SequelRails
     end
 
     def check_skip_connect_conditions(app)
-      app.config.sequel[:skip_connect] ||= database_create_command?
+      app.config.sequel[:skip_connect] ||= command_requiring_no_connection?
     end
 
     def database_connection_required?(app)
       !app.config.sequel[:skip_connect]
     end
 
-    def database_create_command?
-      ARGV.include?("db:create")
+    def command_requiring_no_connection?
+      no_connection_commands = ["db:create", "db:drop"]
+
+      ARGV.any? { |item| no_connection_commands.include?(item) }
     end
   end
 end
