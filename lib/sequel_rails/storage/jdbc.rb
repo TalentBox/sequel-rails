@@ -1,3 +1,6 @@
+require 'uri'
+require 'cgi'
+
 module SequelRails
   module Storage
     class Jdbc < Abstract
@@ -34,6 +37,7 @@ module SequelRails
             db.execute("CREATE DATABASE IF NOT EXISTS `#{db_name}` DEFAULT CHARACTER SET #{charset} DEFAULT COLLATE #{collation}")
           end
         elsif _is_postgres?
+          extract_postgresql_jdbc_config
           adapter = ::SequelRails::Storage::Postgres.new(config)
           adapter._create
         end
@@ -48,6 +52,7 @@ module SequelRails
             db.execute("DROP DATABASE IF EXISTS `#{db_name}`")
           end
         elsif _is_postgres?
+          extract_postgresql_jdbc_config
           adapter = ::SequelRails::Storage::Postgres.new(config)
           adapter._drop
         end
@@ -55,6 +60,7 @@ module SequelRails
 
       def _dump(filename)
         if _is_postgres?
+          extract_postgresql_jdbc_config
           adapter = ::SequelRails::Storage::Postgres.new(config)
           adapter._dump(filename)
         else
@@ -64,6 +70,7 @@ module SequelRails
 
       def _load(filename)
         if _is_postgres?
+          extract_postgresql_jdbc_config
           adapter = ::SequelRails::Storage::Postgres.new(config)
           adapter._load(filename)
         else
@@ -80,6 +87,19 @@ module SequelRails
       end
 
       private
+
+      def extract_postgresql_jdbc_config
+        if config["url"]
+          uri = URI.parse(config["url"].split(":", 2).last)
+          params = CGI::parse(uri.query || "")
+
+          config["database"] ||= uri.path.tr("/", "")
+          config["username"] ||= config["user"] || (params["user"] && params["user"].first)
+          config["password"] ||= params["password"] && params["password"].first
+          config["host"] ||= uri.host
+          config["port"] ||= uri.port
+        end
+      end
 
       def collation
         @collation ||= super || 'utf8_unicode_ci'
