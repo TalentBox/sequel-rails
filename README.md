@@ -344,6 +344,24 @@ rake db:sessions:clear                # Delete all sessions from the database
 rake db:sessions:trim[threshold]      # Delete all sessions older than `threshold` days (default to 30 days, eg: rake db:session:trim[10])
 ```
 
+
+Getting started: A Rails Hello World Walk-through
+=============================
+
+1.  Follow the setup instructions noted above in this guide. 
+2.  Let's create some 'organisations'. Run a `rails scaffold: rails g Organisation registration_no name`
+3.  Run `rake db:create`
+4.  Run `rake db:migrate`
+5.  Go to your models/organisation.rb file add add in plugins to make it work, just like if you had used ActiveRecord:
+
+```ruby
+class Organisation < Sequel::Model
+  Sequel::Model.plugin :active_model ## <=== Add in that magical line. There are other plugins you can add, pertaining to validations etc.
+end
+```
+6.  Run `rails s` and type in the following URL: localhost:3000/organisations - you should be able to add/view/edit/create organisations now.
+
+
 Note on Patches/Pull Requests
 =============================
 
