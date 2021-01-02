@@ -11,7 +11,8 @@ module Sequel
         @_sequel_base_name ||= 'sequel'
       end
 
-      def self.source_root
+      def self.source_root(path = nil)
+        @_sequel_source_root = path if path
         @_sequel_source_root ||= File.expand_path(
           "../#{base_name}/#{generator_name}/templates", __FILE__
         )
