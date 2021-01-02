@@ -19,6 +19,7 @@ begin
       %w(
         TEST_ADAPTER
         TEST_DATABASE
+        TEST_DATABASE_HOST
         TEST_OWNER
         TEST_USERNAME
         TEST_PASSWORD

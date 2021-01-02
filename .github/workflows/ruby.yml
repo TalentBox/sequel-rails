@@ -1,0 +1,150 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: ['**']
+
+jobs:
+  tests:
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby:
+          # - "2.2"
+          # - "2.3"
+          # - "2.4"
+          # - "2.5"
+          - "2.6"
+          # - "2.7"
+          # - "jruby"
+        sequel:
+          # - "~> 4.0"
+          - "~> 5.0"
+        rails:
+          # - "4.0"
+          # - "4.1"
+          # - "4.2"
+          # - "5.0"
+          # - "5.1"
+          # - "5.2"
+          - "6.0"
+        exclude:
+          - ruby: "2.4"
+            rails: "4.0"
+          - ruby: "2.4"
+            rails: "4.1"
+          - ruby: "2.5"
+            rails: "4.0"
+          - ruby: "2.5"
+            rails: "4.1"
+          - ruby: "2.6"
+            rails: "4.0"
+          - ruby: "2.6"
+            rails: "4.1"
+          - ruby: "2.6"
+            rails: "4.2"
+          - ruby: "2.6"
+            rails: "5.0"
+          - ruby: "2.6"
+            rails: "5.1"
+          - ruby: "jruby"
+            rails: "4.0"
+          - ruby: "jruby"
+            rails: "4.1"
+          - ruby: "2.2"
+            rails: "5.2"
+          - ruby: "2.2"
+            rails: "6.0"
+          - ruby: "2.3"
+            rails: "6.0"
+          - ruby: "2.4"
+            rails: "6.0"
+    name: Rails ${{ matrix.rails }}, Sequel ${{ matrix.sequel }}, Ruby ${{ matrix.ruby }}
+
+    env:
+      SEQUEL: "${{ matrix.sequel }}"
+    steps:
+      - name: Create databases
+        run: |
+          mysql -e 'create database sequel_rails_test;' -u root -h 127.0.0.1
+          mysql -e 'create database sequel_rails_test_mysql2;' -u root -h 127.0.0.1
+          mysql -e 'create database sequel_rails_test_storage_dev;' -u root -h 127.0.0.1
+          env PGPASSWORD=postgres psql -c 'create database sequel_rails_test;' -U postgres -h localhost
+          env PGPASSWORD=postgres psql -c 'create database sequel_rails_test_storage_dev;' -U postgres -h localhost
+      - uses: actions/checkout@v2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-
+      - name: Install dependencies
+        run: |
+          bundle config path vendor/bundle
+          bundle config set gemfile "${GITHUB_WORKSPACE}/ci/rails-${{ matrix.rails }}.gemfile"
+          bundle install --jobs 4 --retry 3
+      - name: Run PostgreSQL tests
+        run: bundle exec rake spec
+        env:
+          TEST_ADAPTER: postgresql
+          TEST_DATABASE: sequel_rails_test
+          TEST_DATABASE_HOST: localhost
+          TEST_OWNER: postgres
+          TEST_USERNAME: postgres
+          TEST_PASSWORD: postgres
+      - name: Run MySQL tests
+        run: bundle exec rake spec
+        if: matrix.ruby < '2.4'
+        env:
+          TEST_ADAPTER: mysql
+          TEST_DATABASE: sequel_rails_test
+          TEST_DATABASE_HOST: 127.0.0.1
+          TEST_USERNAME: root
+          TEST_ENCODING: "utf8"
+      - name: Run MySQL2 tests
+        run: bundle exec rake spec
+        if: matrix.ruby != 'jruby'
+        env:
+          TEST_ADAPTER: mysql2
+          TEST_DATABASE: sequel_rails_test_mysql2
+          TEST_DATABASE_HOST: 127.0.0.1
+          TEST_USERNAME: root
+          TEST_ENCODING: "utf8"
+      - name: Run SQLite tests
+        run: bundle exec rake spec
+        env:
+          TEST_ADAPTER: "sqlite3"
+          TEST_DATABASE: "spec/internal/db/database.sqlite3"
+      - name: Lint
+        run: bundle exec rubocop

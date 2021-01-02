@@ -1,6 +1,7 @@
 test:
   adapter: "<%= ENV["TEST_ADAPTER"] || "postgresql" %>"
   database: "<%= ENV["TEST_DATABASE"] || "sequel_rails_test" %>"
+  host: "<%= ENV["TEST_DATABASE_HOST"] %>"
   <% if ENV['TEST_ADAPTER'] != 'sqlite3' %>
   owner: "<%= ENV["TEST_OWNER"] || ENV["USER"] %>"
   user: "<%= ENV["TEST_USERNAME"] || ENV["USER"] %>"
