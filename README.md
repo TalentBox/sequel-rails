@@ -195,6 +195,17 @@ You can configure some options with the usual rails mechanism, in
     # to fail early
     config.sequel.test_connect = true
 
+    # Configure what should happend after SequelRails will create new connection with Sequel (applicable only for the first new connection)
+    # config.sequel.after_connect = proc do
+    #   Sequel::Model.plugin :timestamps, update_on_create: true
+    # end
+
+    # Configure what should happend after new connection in connection pool is created (applicable only for all connections)
+    # to fail early
+    # config.sequel.after_new_connection = proc do |db|
+    #   db.execute('SET statement_timeout = 30000;')
+    # end
+
     # If you want to use a specific logger
     config.sequel.logger = MyLogger.new($stdout)
 ```
@@ -258,6 +269,25 @@ Here's some examples:
       adapter: sqlite # Also accept sqlite3
       database: ":memory:"
 ```
+
+after_connect hooks
+================
+
+There are 2 options how to set after_connect hooks in `config/application.rb`
+
+  1. `config.sequel.after_connect` will be called only on the first new connection. It can be used for enabling plugins or to set some global sequel settings.
+  ```ruby
+    config.sequel.after_connect = proc do
+      Sequel::Model.plugin :timestamps, update_on_create: true
+    end
+  ```
+
+  2. `config.sequel.after_new_connection` will be called after every new connection in connection pool is created. It can be used to run some specific `SET` commands on every new connection. It's using default `after_connect` hook in sequel. https://sequel.jeremyevans.net/rdoc/classes/Sequel/ConnectionPool.html#attribute-i-after_connect
+   ```ruby
+    config.sequel.after_new_connection = proc do |db|
+      db.execute('SET statement_timeout = 30000;')
+    end
+  ```
 
 Enabling plugins
 ================

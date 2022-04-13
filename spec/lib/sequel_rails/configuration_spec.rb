@@ -427,5 +427,16 @@ describe SequelRails::Configuration do
         subject.connect environment
       end
     end
+
+    describe 'after each connection hook' do
+      let(:hook) { double }
+      let(:environment) { 'development' }
+
+      it 'runs hook if provided' do
+        subject.after_new_connection = hook
+        expect(hook).to receive(:call)
+        subject.connect environment
+      end
+    end
   end
 end
