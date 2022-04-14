@@ -434,13 +434,13 @@ describe SequelRails::Configuration do
     end
 
     describe 'after each connection hook' do
-      let(:hook) { double }
       let(:environment) { 'development' }
 
       it 'runs hook if provided' do
-        subject.after_new_connection = hook
-        expect(hook).to receive(:call)
+        called = 0
+        subject.after_new_connection = -> { called += 1 }
         subject.connect environment
+        expect(called).to eq(1)
       end
     end
   end
