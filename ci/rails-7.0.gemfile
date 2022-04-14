@@ -1,8 +1,8 @@
 source 'https://rubygems.org'
 
-gem 'railties', '~> 5.1.6'
-gem 'activemodel', '~> 5.1.6'
-gem 'actionpack', '~> 5.1.6'
+gem 'railties', '~> 7.0.0'
+gem 'activemodel', '~> 7.0.0'
+gem 'actionpack', '~> 7.0.0'
 
 gemspec :path => '../'
 
@@ -13,9 +13,7 @@ gem 'fakefs', '0.11.2', :require => 'fakefs/safe'
 # MRI/Rubinius Adapter Dependencies
 platform :ruby do
   gem 'pg'
-  if RUBY_VERSION < '2.4'
-    gem 'mysql'
-  end
+  gem 'mysql'
   gem 'mysql2'
   gem 'sqlite3'
 end

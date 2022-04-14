@@ -13,9 +13,7 @@ gem 'fakefs', '0.11.2', :require => 'fakefs/safe'
 # MRI/Rubinius Adapter Dependencies
 platform :ruby do
   gem 'pg'
-  if RUBY_VERSION < '2.4'
-    gem 'mysql'
-  end
+  gem 'mysql'
   gem 'mysql2'
   gem 'sqlite3'
 end

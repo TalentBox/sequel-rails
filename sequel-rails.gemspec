@@ -37,4 +37,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '~> 0.52.0'
   s.add_development_dependency 'ammeter', '1.1.4'
   s.add_development_dependency 'test-unit'
+  s.add_development_dependency 'nokogiri', '>= 1.13.4'
 end

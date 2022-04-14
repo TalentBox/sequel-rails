@@ -123,6 +123,7 @@ describe SequelRails::Configuration do
           'database' => 'sequel_rails_test_storage_dev',
           'password' => ENV['TEST_PASSWORD'],
           'host' => '127.0.0.1',
+          'port' => ENV['TEST_DATABASE_PORT'],
         },
         'test' => {
           'adapter' => adapter,
@@ -131,6 +132,7 @@ describe SequelRails::Configuration do
           'database' => 'sequel_rails_test_storage_test',
           'password' => ENV['TEST_PASSWORD'],
           'host' => '127.0.0.1',
+          'port' => ENV['TEST_DATABASE_PORT'],
         },
         'remote' => {
           'adapter' => 'mysql',
