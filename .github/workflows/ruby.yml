@@ -92,9 +92,9 @@ jobs:
           bundle install --jobs 4 --retry 3
       - name: Create databases
         run: |
-          mysql -e 'create database sequel_rails_test;' -u root -p root --port ${{ job.services.mysql.ports[3306] }} -h 127.0.0.1
-          mysql -e 'create database sequel_rails_test_mysql2;' -u root -p root --port ${{ job.services.mysql.ports[3306] }} -h 127.0.0.1
-          mysql -e 'create database sequel_rails_test_storage_dev;' -u root -p root --port ${{ job.services.mysql.ports[3306] }} -h 127.0.0.1
+          mysql -e 'create database sequel_rails_test;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
+          mysql -e 'create database sequel_rails_test_mysql2;'  --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
+          mysql -e 'create database sequel_rails_test_storage_dev;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
           env PGPASSWORD=postgres psql -c 'create database sequel_rails_test;' -U postgres -h localhost -p ${{ job.services.postgres.ports[5432] }}
           env PGPASSWORD=postgres psql -c 'create database sequel_rails_test_storage_dev;' -U postgres -h localhost -p ${{ job.services.postgres.ports[5432] }}
       - name: Run PostgreSQL tests
