@@ -113,10 +113,11 @@ describe SequelRails::Configuration do
   end
 
   describe '#connect' do
+    let(:adapter) { ENV['TEST_ADAPTER'] || 'postgres' }
     let(:environments) do
       {
         'development' => {
-          'adapter' => (ENV['TEST_ADAPTER'] || 'postgres'),
+          'adapter' => adapter,
           'owner' => (ENV['TEST_OWNER'] || ENV['USER']),
           'username' => (ENV['TEST_OWNER'] || ENV['USER']),
           'database' => 'sequel_rails_test_storage_dev',
@@ -124,7 +125,7 @@ describe SequelRails::Configuration do
           'host' => '127.0.0.1',
         },
         'test' => {
-          'adapter' => (ENV['TEST_ADAPTER'] || 'postgres'),
+          'adapter' => adapter,
           'owner' => (ENV['TEST_OWNER'] || ENV['USER']),
           'username' => (ENV['TEST_OWNER'] || ENV['USER']),
           'database' => 'sequel_rails_test_storage_test',
