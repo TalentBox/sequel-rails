@@ -9,6 +9,8 @@ test:
   <% end %>
   <% if ENV['TEST_ADAPTER'] =~ /mysql/ %>
   encoding: "<%= ENV["TEST_ENCODING"] || "utf8" %>"
+  port: "<%= ENV["TEST_DATABASE_PORT"] || "3306" %>"
   <% elsif ENV['TEST_ADAPTER'] =~ /postgres/ %>
   encoding: "<%= ENV["TEST_ENCODING"] || "unicode" %>"
+  port: "<%= ENV["TEST_DATABASE_PORT"] || "5432" %>"
   <% end %>

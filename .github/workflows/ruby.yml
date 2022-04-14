@@ -103,6 +103,7 @@ jobs:
           TEST_ADAPTER: postgresql
           TEST_DATABASE: sequel_rails_test
           TEST_DATABASE_HOST: localhost
+          TEST_DATABASE_PORT: ${{ job.services.postgres.ports[5432] }}
           TEST_OWNER: postgres
           TEST_USERNAME: postgres
           TEST_PASSWORD: postgres
@@ -113,7 +114,9 @@ jobs:
           TEST_ADAPTER: mysql
           TEST_DATABASE: sequel_rails_test
           TEST_DATABASE_HOST: 127.0.0.1
+          TEST_DATABASE_PORT: ${{ job.services.mysql.ports[3306] }}
           TEST_USERNAME: root
+          TEST_PASSWORD: root
           TEST_ENCODING: "utf8"
       - name: Run MySQL2 tests
         run: bundle exec rake spec
@@ -122,7 +125,9 @@ jobs:
           TEST_ADAPTER: mysql2
           TEST_DATABASE: sequel_rails_test_mysql2
           TEST_DATABASE_HOST: 127.0.0.1
+          TEST_DATABASE_PORT: ${{ job.services.mysql.ports[3306] }}
           TEST_USERNAME: root
+          TEST_PASSWORD: root
           TEST_ENCODING: "utf8"
       - name: Run SQLite tests
         run: bundle exec rake spec
