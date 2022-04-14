@@ -82,7 +82,7 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
       - name: Install db dependencies and check connections
         run: |
-          DEBIAN_FRONTEND="noninteractive" apt-get install -yqq mysql-client libmysqlclient-dev postgresql-client libpq-dev
+          DEBIAN_FRONTEND="noninteractive" sudo apt-get install -yqq mysql-client libmysqlclient-dev postgresql-client libpq-dev
           mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot -e "SHOW GRANTS FOR 'root'@'localhost'"
           env PGPASSWORD=postgres psql -h localhost -p ${{ job.services.postgres.ports[5432] }} -U postgres -l
       - name: Install dependencies
