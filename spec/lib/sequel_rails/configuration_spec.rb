@@ -438,7 +438,7 @@ describe SequelRails::Configuration do
 
       it 'runs hook if provided' do
         called = 0
-        subject.after_new_connection = -> { called += 1 }
+        subject.after_new_connection = ->(_conn){ called += 1 }
         subject.connect environment
         expect(called).to eq(1)
       end
