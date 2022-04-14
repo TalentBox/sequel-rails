@@ -29,13 +29,13 @@ Gem::Specification.new do |s|
   s.add_dependency 'actionpack', '>= 4.0.0'
   s.add_dependency 'sequel', ['>= 3.28', '< 6.0']
 
-  s.add_development_dependency 'combustion'
+  s.add_development_dependency 'combustion', '~> 1.3'
   s.add_development_dependency 'generator_spec'
   s.add_development_dependency 'rake', '>= 0.8.7', '< 12.1'
-  s.add_development_dependency 'rspec', '~> 3.7'
-  s.add_development_dependency 'rspec-rails', '~> 3.7'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'rubocop', '~> 0.52.0'
-  s.add_development_dependency 'ammeter', '1.1.4'
+  s.add_development_dependency 'ammeter', '1.1.5'
   s.add_development_dependency 'test-unit'
   s.add_development_dependency 'nokogiri', '>= 1.13.4'
 end

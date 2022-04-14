@@ -134,7 +134,12 @@ describe SequelRails::Configuration do
           'host' => '127.0.0.1',
           'port' => ENV['TEST_DATABASE_PORT'],
         },
-        'remote' => {
+        'remote_pg' => {
+          'adapter' => 'postgres',
+          'host' => '10.0.0.1',
+          'database' => 'sequel_rails_test_storage_dev',
+        },
+        'remote_mysql' => {
           'adapter' => 'mysql',
           'host' => '10.0.0.1',
           'database' => 'sequel_rails_test_storage_remote',
@@ -320,7 +325,7 @@ describe SequelRails::Configuration do
           end
         end
 
-        let(:environment) { 'development' }
+        let(:environment) { 'remote_pg' }
 
         context 'in C-Ruby' do
           include_examples 'test_connect'
@@ -352,7 +357,7 @@ describe SequelRails::Configuration do
             expect(::Sequel).to receive(:connect) do |url, hash|
               expect(url).to start_with('jdbc:postgresql://')
               expect(hash[:adapter]).to eq('jdbc:postgresql')
-              expect(hash[:host]).to eq('127.0.0.1')
+              expect(hash[:host]).to eq('10.0.0.1')
             end
             subject.connect environment
           end
@@ -372,7 +377,7 @@ describe SequelRails::Configuration do
       end
 
       context 'for a mysql connection' do
-        let(:environment) { 'remote' }
+        let(:environment) { 'remote_mysql' }
 
         context 'in C-Ruby' do
           include_examples 'test_connect'
