@@ -9,7 +9,6 @@ gem 'pry'
 
 # MRI/Rubinius Adapter Dependencies
 platform :ruby do
-  gem 'mysql'
   gem 'mysql2'
   gem 'pg'
   gem 'sqlite3'

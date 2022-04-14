@@ -68,28 +68,29 @@ jobs:
 
     env:
       SEQUEL: "${{ matrix.sequel }}"
+      BUNDLE_GEMFILE: "${GITHUB_WORKSPACE}/ci/rails-${{ matrix.rails }}.gemfile"
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: vendor/bundle
+      #     key: bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
+      #     restore-keys: |
+      #       bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-
       - name: Install db dependencies and check connections
         run: |
           DEBIAN_FRONTEND="noninteractive" sudo apt-get install -yqq mysql-client libmysqlclient-dev postgresql-client libpq-dev
           mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot -e "SHOW GRANTS FOR 'root'@'localhost'"
           env PGPASSWORD=postgres psql -h localhost -p ${{ job.services.postgres.ports[5432] }} -U postgres -l
-      - name: Install dependencies
-        run: |
-          bundle config path vendor/bundle
-          bundle config set gemfile "${GITHUB_WORKSPACE}/ci/rails-${{ matrix.rails }}.gemfile"
-          bundle install --jobs 4 --retry 3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      # - name: Install dependencies
+      #   run: |
+      #     bundle config path vendor/bundle
+      #     bundle config set gemfile "${GITHUB_WORKSPACE}/ci/rails-${{ matrix.rails }}.gemfile"
+      #     bundle install --jobs 4 --retry 3
       - name: Create databases
         run: |
           mysql -e 'create database sequel_rails_test;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
@@ -107,17 +108,6 @@ jobs:
           TEST_OWNER: postgres
           TEST_USERNAME: postgres
           TEST_PASSWORD: postgres
-      - name: Run MySQL tests
-        run: bundle exec rake spec
-        if: matrix.ruby < '2.4'
-        env:
-          TEST_ADAPTER: mysql
-          TEST_DATABASE: sequel_rails_test
-          TEST_DATABASE_HOST: 127.0.0.1
-          TEST_DATABASE_PORT: ${{ job.services.mysql.ports[3306] }}
-          TEST_USERNAME: root
-          TEST_PASSWORD: root
-          TEST_ENCODING: "utf8"
       - name: Run MySQL2 tests
         run: bundle exec rake spec
         if: matrix.ruby != 'jruby'
