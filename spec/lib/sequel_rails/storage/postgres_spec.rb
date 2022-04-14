@@ -83,6 +83,17 @@ describe SequelRails::Storage::Postgres, :postgres do
     end
   end
 
+  describe '#drop' do
+    before do
+      stub_const('Sequel::DATABASES', [])
+    end
+
+    it 'properly executes without active sequel connections' do
+      expect(Sequel::Model).not_to receive(:db)
+      subject.drop
+    end
+  end
+
   describe '#_dump' do
     let(:dump_file_name) { 'dump.sql' }
     it 'uses the pg_dump command' do

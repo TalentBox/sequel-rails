@@ -27,6 +27,7 @@ module SequelRails
       self.schema_dump = default_schema_dump
       self.load_database_tasks = true
       self.after_connect = nil
+      self.after_new_connection = nil
       self.skip_connect = nil
       self.test_connect = true
     end
@@ -75,6 +76,7 @@ module SequelRails
       config['search_path'] = search_path if search_path
       config['servers'] = servers if servers
       config['test'] = test_connect
+      config['after_connect'] = after_new_connection if after_new_connection
 
       url = ENV['DATABASE_URL']
       config['url'] ||= url if url
