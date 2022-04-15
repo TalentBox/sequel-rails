@@ -38,20 +38,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby:
-          - "2.6"
-          - "2.7"
-          - "3.0"
-          - "3.1"
-          # - "jruby"
-        sequel:
-          - "~> 4.0"
-          - "~> 5.0"
         rails:
           - "5.2"
           - "6.0"
           - "6.1"
           - "7.0"
+        sequel:
+          - "~> 5.0"
+        ruby:
+          - "2.6"
+          - "2.7"
+          - "3.0"
+          - "3.1"
+          - "jruby"
         exclude:
           - ruby: "2.7"
             rails: "5.2"
