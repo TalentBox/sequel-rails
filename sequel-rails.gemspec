@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'combustion', '~> 1.3'
   s.add_development_dependency 'generator_spec'
-  s.add_development_dependency 'rake', '>= 0.8.7', '< 12.1'
+  s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'rubocop', '1.27.0'
