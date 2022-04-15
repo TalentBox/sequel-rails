@@ -70,13 +70,7 @@ jobs:
       SEQUEL: "${{ matrix.sequel }}"
       BUNDLE_GEMFILE: "ci/rails-${{ matrix.rails }}.gemfile"
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-${{ hashFiles('ci/*.gemfile.lock') }}
-          restore-keys: |
-            bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-
+      - uses: actions/checkout@v3
       - name: Install db dependencies and check connections
         run: |
           DEBIAN_FRONTEND="noninteractive" sudo apt-get install -yqq mysql-client libmysqlclient-dev postgresql-client libpq-dev
@@ -86,6 +80,12 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
+      - uses: actions/cache@v3
+        with:
+          path: vendor/bundle
+          key: bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-${{ hashFiles('ci/*.gemfile.lock') }}
+          restore-keys: |
+            bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-
       - name: Create databases
         run: |
           mysql -e 'create database sequel_rails_test;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
