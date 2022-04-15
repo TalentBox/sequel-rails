@@ -26,7 +26,6 @@ module SequelRails
       def dump_schema_information(opts = {})
         sql = opts.fetch :sql
         adapter = SequelRails::Storage.adapter_for(Rails.env)
-        db = ::Sequel::Model.db
         res = ''
 
         if available_migrations?

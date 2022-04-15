@@ -1,10 +1,10 @@
 Sequel.migration do
   change do
-    create_table :users do
+    create_table? :users do
       primary_key :id
       String      :email
     end
-    create_table :sessions do
+    create_table? :sessions do
       primary_key :id
       String :session_id, :null => false, :unique => true, :index => true
       String :data, :text => true, :null => false

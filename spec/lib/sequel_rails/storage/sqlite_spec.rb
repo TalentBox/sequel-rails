@@ -17,7 +17,10 @@ describe SequelRails::Storage::Sqlite, :sqlite do
       it 'defer to Sequel' do
         path = double(:path)
         allow(subject).to receive(:path).and_return path
-        expect(::Sequel).to receive(:connect).with('adapter' => 'sqlite3', 'database' => path)
+        expect(::Sequel).to receive(:connect).with({
+          'adapter' => 'sqlite3',
+          'database' => path
+        })
         subject._create
       end
     end

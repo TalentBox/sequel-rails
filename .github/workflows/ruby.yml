@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: ['**']
+
+jobs:
+  tests:
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+        - 5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+        - 3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rails:
+          - "5.2"
+          - "6.0"
+          - "6.1"
+          - "7.0"
+        sequel:
+          - "~> 5.0"
+        ruby:
+          - "2.6"
+          - "2.7"
+          - "3.0"
+          - "3.1"
+          # - "jruby"
+        exclude:
+          - ruby: "2.7"
+            rails: "5.2"
+          - ruby: "3.0"
+            rails: "5.2"
+          - ruby: "3.1"
+            rails: "5.2"
+          - ruby: "3.0"
+            rails: "6.0"
+          - ruby: "3.1"
+            rails: "6.0"
+          - ruby: "3.1"
+            rails: "6.1"
+          - ruby: "2.6"
+            rails: "7.0"
+          - ruby: "jruby"
+            rails: "7.0"
+    name: Rails ${{ matrix.rails }}, Sequel ${{ matrix.sequel }}, Ruby ${{ matrix.ruby }}
+
+    env:
+      SEQUEL: "${{ matrix.sequel }}"
+      BUNDLE_GEMFILE: "ci/rails-${{ matrix.rails }}.gemfile"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install db dependencies and check connections
+        run: |
+          DEBIAN_FRONTEND="noninteractive" sudo apt-get install -yqq mysql-client libmysqlclient-dev postgresql-client libpq-dev
+          mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot -e "SHOW GRANTS FOR 'root'@'localhost'"
+          env PGPASSWORD=postgres psql -h localhost -p ${{ job.services.postgres.ports[5432] }} -U postgres -l
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Create databases
+        run: |
+          mysql -e 'create database sequel_rails_test;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
+          mysql -e 'create database sequel_rails_test_mysql2;'  --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
+          mysql -e 'create database sequel_rails_test_storage_dev;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
+          env PGPASSWORD=postgres psql -c 'create database sequel_rails_test;' -U postgres -h localhost -p ${{ job.services.postgres.ports[5432] }}
+          env PGPASSWORD=postgres psql -c 'create database sequel_rails_test_storage_dev;' -U postgres -h localhost -p ${{ job.services.postgres.ports[5432] }}
+      - name: Run PostgreSQL tests
+        run: bundle exec rspec
+        env:
+          TEST_ADAPTER: postgresql
+          TEST_DATABASE: sequel_rails_test
+          TEST_DATABASE_HOST: localhost
+          TEST_DATABASE_PORT: ${{ job.services.postgres.ports[5432] }}
+          TEST_OWNER: postgres
+          TEST_USERNAME: postgres
+          TEST_PASSWORD: postgres
+      - name: Run MySQL2 tests
+        run: bundle exec rspec
+        if: matrix.ruby != 'jruby'
+        env:
+          TEST_ADAPTER: mysql2
+          TEST_DATABASE: sequel_rails_test_mysql2
+          TEST_DATABASE_HOST: 127.0.0.1
+          TEST_DATABASE_PORT: ${{ job.services.mysql.ports[3306] }}
+          TEST_USERNAME: root
+          TEST_PASSWORD: root
+          TEST_ENCODING: "utf8"
+      - name: Run SQLite tests
+        run: bundle exec rspec
+        env:
+          TEST_ADAPTER: "sqlite3"
+          TEST_DATABASE: "db/database.sqlite3"
+      - name: Lint
+        run: bundle exec rubocop

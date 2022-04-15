@@ -113,23 +113,33 @@ describe SequelRails::Configuration do
   end
 
   describe '#connect' do
+    let(:adapter) { ENV['TEST_ADAPTER'] || 'postgres' }
     let(:environments) do
       {
         'development' => {
-          'adapter' => 'postgres',
+          'adapter' => adapter,
           'owner' => (ENV['TEST_OWNER'] || ENV['USER']),
-          'username' => (ENV['TEST_OWNER'] || ENV['USER']),
+          'username' => (ENV['TEST_USERNAME'] || ENV['TEST_OWNER'] || ENV['USER']),
           'database' => 'sequel_rails_test_storage_dev',
-          'host' => '127.0.0.1',
+          'password' => ENV['TEST_PASSWORD'],
+          'host' => ENV['TEST_DATABASE_HOST'],
+          'port' => ENV['TEST_DATABASE_PORT'],
         },
         'test' => {
-          'adapter' => 'postgres',
+          'adapter' => adapter,
           'owner' => (ENV['TEST_OWNER'] || ENV['USER']),
-          'username' => (ENV['TEST_OWNER'] || ENV['USER']),
+          'username' => (ENV['TEST_USERNAME'] || ENV['TEST_OWNER'] || ENV['USER']),
           'database' => 'sequel_rails_test_storage_test',
-          'host' => '127.0.0.1',
+          'password' => ENV['TEST_PASSWORD'],
+          'host' => ENV['TEST_DATABASE_HOST'],
+          'port' => ENV['TEST_DATABASE_PORT'],
         },
-        'remote' => {
+        'remote_pg' => {
+          'adapter' => 'postgres',
+          'host' => '10.0.0.1',
+          'database' => 'sequel_rails_test_storage_dev',
+        },
+        'remote_mysql' => {
           'adapter' => 'mysql',
           'host' => '10.0.0.1',
           'database' => 'sequel_rails_test_storage_remote',
@@ -315,7 +325,7 @@ describe SequelRails::Configuration do
           end
         end
 
-        let(:environment) { 'development' }
+        let(:environment) { 'remote_pg' }
 
         context 'in C-Ruby' do
           include_examples 'test_connect'
@@ -347,7 +357,7 @@ describe SequelRails::Configuration do
             expect(::Sequel).to receive(:connect) do |url, hash|
               expect(url).to start_with('jdbc:postgresql://')
               expect(hash[:adapter]).to eq('jdbc:postgresql')
-              expect(hash[:host]).to eq('127.0.0.1')
+              expect(hash[:host]).to eq('10.0.0.1')
             end
             subject.connect environment
           end
@@ -367,7 +377,7 @@ describe SequelRails::Configuration do
       end
 
       context 'for a mysql connection' do
-        let(:environment) { 'remote' }
+        let(:environment) { 'remote_mysql' }
 
         context 'in C-Ruby' do
           include_examples 'test_connect'
@@ -429,13 +439,13 @@ describe SequelRails::Configuration do
     end
 
     describe 'after each connection hook' do
-      let(:hook) { double }
       let(:environment) { 'development' }
 
       it 'runs hook if provided' do
-        subject.after_new_connection = hook
-        expect(hook).to receive(:call)
+        called = 0
+        subject.after_new_connection = ->(_conn){ called += 1 }
         subject.connect environment
+        expect(called).to eq(1)
       end
     end
   end

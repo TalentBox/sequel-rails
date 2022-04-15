@@ -1,6 +1,8 @@
 source 'https://rubygems.org'
 
-gem 'railties', '~> 4.0.13'
+gem 'railties', '~> 6.1.0'
+gem 'activemodel', '~> 6.1.0'
+gem 'actionpack', '~> 6.1.0'
 
 gemspec :path => '../'
 
@@ -8,12 +10,11 @@ gem 'sequel', "#{ENV['SEQUEL']}"
 
 gem 'fakefs', '0.11.2', :require => 'fakefs/safe'
 
+gem 'rspec-rails', '~> 5.0'
+
 # MRI/Rubinius Adapter Dependencies
 platform :ruby do
   gem 'pg'
-  if RUBY_VERSION < '2.4'
-    gem 'mysql'
-  end
   gem 'mysql2'
   gem 'sqlite3'
 end

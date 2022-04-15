@@ -9,7 +9,7 @@ describe SessionsController, :type => :request do
     else
       {:status => 'logged_in'}
     end
-    post '/session', opts
+    post '/session', **opts
   end
 
   describe '#create' do

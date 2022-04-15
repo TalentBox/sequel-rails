@@ -19,6 +19,7 @@ begin
       %w(
         TEST_ADAPTER
         TEST_DATABASE
+        TEST_DATABASE_HOST
         TEST_OWNER
         TEST_USERNAME
         TEST_PASSWORD
@@ -32,10 +33,6 @@ begin
       'postgresql' => { 'TEST_ENCODING' => 'unicode' },
       'sqlite3'    => { 'TEST_DATABASE' => File.join(File.expand_path('.'), 'spec/internal/db/database.sqlite3') },
     }
-
-    configs.merge!(
-      'mysql' => { 'TEST_ENCODING' => 'utf8', 'TEST_USERNAME' => 'root' }
-    ) if RUBY_VERSION < '2.4'
 
     configs.merge!(
       'mysql2' => { 'TEST_ENCODING' => 'utf8', 'TEST_USERNAME' => 'root', 'TEST_DATABASE' => 'sequel_rails_test_mysql2' }

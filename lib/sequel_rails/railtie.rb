@@ -82,6 +82,10 @@ module SequelRails
     def configure_sequel(app)
       rails_db_config = begin
         app.config.database_configuration
+      rescue RuntimeError => e
+        raise unless e.message =~ /Cannot load database configuration/
+
+        {} # will try to use DATABASE_URL
       rescue Errno::ENOENT
         {} # will try to use DATABASE_URL
       end
@@ -112,7 +116,7 @@ module SequelRails
     end
 
     def database_create_command?
-      ["db:create", "db:create:all"].any? { |c| ARGV.include?(c) }
+      ['db:create', 'db:create:all'].any? { |c| ARGV.include?(c) }
     end
   end
 end
