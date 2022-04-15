@@ -50,7 +50,7 @@ jobs:
           - "2.7"
           - "3.0"
           - "3.1"
-          - "jruby"
+          # - "jruby"
         exclude:
           - ruby: "2.7"
             rails: "5.2"
@@ -65,6 +65,8 @@ jobs:
           - ruby: "3.1"
             rails: "6.1"
           - ruby: "2.6"
+            rails: "7.0"
+          - ruby: "jruby"
             rails: "7.0"
     name: Rails ${{ matrix.rails }}, Sequel ${{ matrix.sequel }}, Ruby ${{ matrix.ruby }}
 
