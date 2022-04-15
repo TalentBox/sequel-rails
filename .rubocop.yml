@@ -11,6 +11,7 @@ AllCops:
   Exclude:
     - 'lib/sequel-rails.rb'
     - 'ci/**/*'
+    - 'vendor/bundle/**/*'
 
 HashSyntax:
   EnforcedStyle: hash_rockets
