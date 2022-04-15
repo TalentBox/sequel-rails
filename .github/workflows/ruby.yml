@@ -50,7 +50,7 @@ jobs:
         rails:
           - "5.2"
           - "6.0"
-          # - "6.1"
+          - "6.1"
           # - "7.0"
         exclude:
           - ruby: "2.7"
@@ -65,6 +65,8 @@ jobs:
             rails: "6.0"
           - ruby: "3.1"
             rails: "6.1"
+          - ruby: "2.6"
+            rails: "7.0"
     name: Rails ${{ matrix.rails }}, Sequel ${{ matrix.sequel }}, Ruby ${{ matrix.ruby }}
 
     env:
@@ -81,12 +83,6 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-${{ hashFiles('ci/*.gemfile.lock') }}
-          restore-keys: |
-            bundle-use-rails-${{ matrix.rails }}-sequel-${{ matrix.sequel }}-ruby-${{ matrix.ruby }}-
       - name: Create databases
         run: |
           mysql -e 'create database sequel_rails_test;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
