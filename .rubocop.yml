@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
   Include:
     - '**/Gemfile'
@@ -13,4 +15,3 @@ AllCops:
 HashSyntax:
   EnforcedStyle: hash_rockets
 
-inherit_from: rubocop-todo.yml

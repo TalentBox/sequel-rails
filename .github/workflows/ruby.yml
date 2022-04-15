@@ -99,7 +99,7 @@ jobs:
           env PGPASSWORD=postgres psql -c 'create database sequel_rails_test;' -U postgres -h localhost -p ${{ job.services.postgres.ports[5432] }}
           env PGPASSWORD=postgres psql -c 'create database sequel_rails_test_storage_dev;' -U postgres -h localhost -p ${{ job.services.postgres.ports[5432] }}
       - name: Run PostgreSQL tests
-        run: bundle exec rake spec
+        run: bundle exec rspec
         env:
           TEST_ADAPTER: postgresql
           TEST_DATABASE: sequel_rails_test
@@ -109,7 +109,7 @@ jobs:
           TEST_USERNAME: postgres
           TEST_PASSWORD: postgres
       - name: Run MySQL2 tests
-        run: bundle exec rake spec
+        run: bundle exec rspec
         if: matrix.ruby != 'jruby'
         env:
           TEST_ADAPTER: mysql2
@@ -120,7 +120,7 @@ jobs:
           TEST_PASSWORD: root
           TEST_ENCODING: "utf8"
       - name: Run SQLite tests
-        run: bundle exec rake spec
+        run: bundle exec rspec
         env:
           TEST_ADAPTER: "sqlite3"
           TEST_DATABASE: "spec/internal/db/database.sqlite3"
