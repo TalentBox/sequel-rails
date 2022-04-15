@@ -9,7 +9,7 @@
 
 This gem provides the railtie that allows
 [sequel](http://github.com/jeremyevans/sequel) to hook into
-[Rails (4.x and 5.x)](http://github.com/rails/rails) and thus behave like a
+[Rails (5.2.x, 6.x, 7.x)](http://github.com/rails/rails) and thus behave like a
 rails framework component. Just like activerecord does in rails,
 [sequel-rails](http://github.com/talentbox/sequel-rails) uses the railtie API to
 hook into rails. The two are actually hooked into rails almost identically.
@@ -27,7 +27,7 @@ Since January 2013, we've become the official maintainers of the gem after
 Using sequel-rails
 ==================
 
-Using sequel with Rails (4.x or 5.x) requires a couple minor changes.
+Using sequel with Rails (5.2.x, 6.x, 7.x) requires a couple minor changes.
 
 First, add the following to your Gemfile (after the `Rails` lines):
 
@@ -387,15 +387,15 @@ Note on Patches/Pull Requests
 The sequel-rails team
 =====================
 
-* Jonathan Tron (JonathanTron) - Current maintainer
-* Joseph Halter (JosephHalter) - Current maintainer
+* Jonathan Tron (@JonathanTron) - Current maintainer
+* Joseph Halter (@JosephHalter) - Current maintainer
 
 Previous maintainer
 ===================
 
 [Original project](https://github.com/brasten/sequel-rails):
 
-* Brasten Sager (brasten) - Project creator
+* Brasten Sager (@brasten) - Project creator
 
 Contributors
 ============
@@ -459,4 +459,4 @@ The [dm-rails](http://github.com/datamapper/dm-rails) team wrote most of the ori
 Copyright
 =========
 
-Copyright (c) 2010-2013 The sequel-rails team. See [LICENSE](http://github.com/brasten/sequel-rails/blob/master/LICENSE) for details.
+Copyright (c) 2010-2022 The sequel-rails team. See [LICENSE](http://github.com/brasten/sequel-rails/blob/master/LICENSE) for details.

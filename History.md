@@ -1,6 +1,7 @@
-dev
-===
+1.2.0 (2022-04-15)
+==================
 
+* Migrate CI to Github actions (Jonathan Tron)
 * Add a new sequel-rails hook: `after_new_connection` which
   sets `Sequel`'s `after_connect`, and is triggered for every
   new connection (@kamilpavlicko)
