@@ -8,11 +8,13 @@ AllCops:
     - '**/*.rake'
     - '**/*.gemfile'
     - '**/*.gemspec'
+    - '**/*.rb'
   Exclude:
-    - 'lib/sequel-rails.rb'
     - 'ci/**/*'
     - 'vendor/bundle/**/*'
+  SuggestExtensions: false
+  NewCops: disable
 
-HashSyntax:
+Style/HashSyntax:
   EnforcedStyle: hash_rockets
 
