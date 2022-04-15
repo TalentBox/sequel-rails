@@ -18,3 +18,5 @@ AllCops:
 Style/HashSyntax:
   EnforcedStyle: hash_rockets
 
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
