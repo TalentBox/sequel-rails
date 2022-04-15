@@ -1,7 +1,7 @@
 # sequel-rails
 
 [![Gem Version](https://badge.fury.io/rb/sequel-rails.svg)][gem]
-[![Build Status](https://secure.travis-ci.org/TalentBox/sequel-rails.svg?branch=master)][travis]
+[![Build Status](https://github.com/TalentBox/sequel-rails/actions/workflows/ci.yml/badge.svg)][github actions]
 [![Code Climate](https://codeclimate.com/github/TalentBox/sequel-rails.svg)][codeclimate]
 
 [gem]: https://rubygems.org/gems/sequel-rails
