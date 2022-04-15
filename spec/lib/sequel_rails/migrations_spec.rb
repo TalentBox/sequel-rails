@@ -10,7 +10,9 @@ describe SequelRails::Migrations do
       context 'with no version specified' do
         it 'runs migrations using Sequel::Migrator' do
           expect(::Sequel::Migrator).to receive(:run).with(
-            db, Rails.root.join('db/migrate'), allow_missing_migration_files: false
+            db,
+            Rails.root.join('db/migrate'),
+            {:allow_missing_migration_files => false}
           ).and_return result
           expect(described_class.send(migration_method)).to be(result)
         end
@@ -18,7 +20,9 @@ describe SequelRails::Migrations do
       context 'with version specified' do
         it 'runs migrations using Sequel::Migrator' do
           expect(::Sequel::Migrator).to receive(:run).with(
-            db, Rails.root.join('db/migrate'), allow_missing_migration_files: false, target: 1
+            db,
+            Rails.root.join('db/migrate'),
+            {:allow_missing_migration_files => false, :target => 1}
           ).and_return result
           expect(described_class.send(migration_method, 1)).to be(result)
         end
@@ -36,7 +40,9 @@ describe SequelRails::Migrations do
 
         it 'runs migrations using Sequel::Migrator' do
           expect(::Sequel::Migrator).to receive(:run).with(
-            db, Rails.root.join('db/migrate'), allow_missing_migration_files: true
+            db,
+            Rails.root.join('db/migrate'),
+            {:allow_missing_migration_files => true}
           ).and_return result
 
           described_class.send(migration_method)
