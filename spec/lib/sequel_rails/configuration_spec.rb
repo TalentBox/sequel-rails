@@ -119,19 +119,19 @@ describe SequelRails::Configuration do
         'development' => {
           'adapter' => adapter,
           'owner' => (ENV['TEST_OWNER'] || ENV['USER']),
-          'username' => (ENV['TEST_OWNER'] || ENV['USER']),
+          'username' => (ENV['TEST_USERNAME'] || ENV['TEST_OWNER'] || ENV['USER']),
           'database' => 'sequel_rails_test_storage_dev',
           'password' => ENV['TEST_PASSWORD'],
-          'host' => '127.0.0.1',
+          'host' => ENV['TEST_DATABASE_HOST'],
           'port' => ENV['TEST_DATABASE_PORT'],
         },
         'test' => {
           'adapter' => adapter,
           'owner' => (ENV['TEST_OWNER'] || ENV['USER']),
-          'username' => (ENV['TEST_OWNER'] || ENV['USER']),
+          'username' => (ENV['TEST_USERNAME'] || ENV['TEST_OWNER'] || ENV['USER']),
           'database' => 'sequel_rails_test_storage_test',
           'password' => ENV['TEST_PASSWORD'],
-          'host' => '127.0.0.1',
+          'host' => ENV['TEST_DATABASE_HOST'],
           'port' => ENV['TEST_DATABASE_PORT'],
         },
         'remote_pg' => {
