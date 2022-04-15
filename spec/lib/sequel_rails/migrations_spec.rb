@@ -12,7 +12,7 @@ describe SequelRails::Migrations do
           expect(::Sequel::Migrator).to receive(:run).with(
             db,
             Rails.root.join('db/migrate'),
-            {:allow_missing_migration_files => false}
+            { :allow_missing_migration_files => false }
           ).and_return result
           expect(described_class.send(migration_method)).to be(result)
         end
@@ -22,7 +22,7 @@ describe SequelRails::Migrations do
           expect(::Sequel::Migrator).to receive(:run).with(
             db,
             Rails.root.join('db/migrate'),
-            {:allow_missing_migration_files => false, :target => 1}
+            { :allow_missing_migration_files => false, :target => 1 }
           ).and_return result
           expect(described_class.send(migration_method, 1)).to be(result)
         end
@@ -42,7 +42,7 @@ describe SequelRails::Migrations do
           expect(::Sequel::Migrator).to receive(:run).with(
             db,
             Rails.root.join('db/migrate'),
-            {:allow_missing_migration_files => true}
+            { :allow_missing_migration_files => true }
           ).and_return result
 
           described_class.send(migration_method)
