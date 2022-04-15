@@ -93,8 +93,12 @@ describe SequelRails::Railtie do
 
     context 'and DATABASE_URL is defined' do
       let :database_url do
-        cfg = Combustion::Application.config.database_configuration['test']
-        SequelRails::DbConfig.new(cfg).url
+        if ENV['TEST_ADAPTER']=~/sqlite/
+          'sqlite:/' # in-memory db
+        else
+          cfg = Combustion::Application.config.database_configuration['test']
+          SequelRails::DbConfig.new(cfg).url
+        end
       end
 
       around do |ex|
