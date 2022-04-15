@@ -1,11 +1,10 @@
 # sequel-rails
 
 [![Gem Version](https://badge.fury.io/rb/sequel-rails.svg)][gem]
-[![Build Status](https://github.com/TalentBox/sequel-rails/actions/workflows/ci.yml/badge.svg)][github actions]
+![Build Status](https://github.com/TalentBox/sequel-rails/actions/workflows/ci.yml/badge.svg)
 [![Code Climate](https://codeclimate.com/github/TalentBox/sequel-rails.svg)][codeclimate]
 
 [gem]: https://rubygems.org/gems/sequel-rails
-[travis]: http://travis-ci.org/TalentBox/sequel-rails
 [codeclimate]: https://codeclimate.com/github/TalentBox/sequel-rails
 
 This gem provides the railtie that allows
