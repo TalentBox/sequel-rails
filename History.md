@@ -1,3 +1,9 @@
+Dev (unreleased)
+================
+
+* Update github pages (Stefan Vermaas)
+  [#189](https://github.com/TalentBox/sequel-rails/pull/189)
+
 1.2.0 (2022-04-15)
 ==================
 

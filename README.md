@@ -450,6 +450,7 @@ Improvements have been made by those awesome contributors:
 * Adrián Mugnolo (@xymbol)
 * Ivan (@AnotherRegularDude)
 * kamilpavlicko (@kamilpavlicko)
+* Stefan Vermaas (@stefanvermaas)
 
 Credits
 =======
@@ -459,4 +460,4 @@ The [dm-rails](http://github.com/datamapper/dm-rails) team wrote most of the ori
 Copyright
 =========
 
-Copyright (c) 2010-2022 The sequel-rails team. See [LICENSE](http://github.com/brasten/sequel-rails/blob/master/LICENSE) for details.
+Copyright (c) 2010-2022 The sequel-rails team. See [LICENSE](http://github.com/TalentBox/sequel-rails/blob/master/LICENSE) for details.
