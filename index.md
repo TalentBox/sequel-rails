@@ -1,16 +1,15 @@
 # sequel-rails
 
-[![Gem Version](https://badge.fury.io/rb/sequel-rails.png)][gem]
-[![Build Status](https://secure.travis-ci.org/TalentBox/sequel-rails.png?branch=master)][travis]
-[![Code Climate](https://codeclimate.com/github/TalentBox/sequel-rails.png)][codeclimate]
+[![Gem Version](https://badge.fury.io/rb/sequel-rails.svg)][gem]
+![Build Status](https://github.com/TalentBox/sequel-rails/actions/workflows/ci.yml/badge.svg)
+[![Code Climate](https://codeclimate.com/github/TalentBox/sequel-rails.svg)][codeclimate]
 
 [gem]: https://rubygems.org/gems/sequel-rails
-[travis]: http://travis-ci.org/TalentBox/sequel-rails
 [codeclimate]: https://codeclimate.com/github/TalentBox/sequel-rails
 
 This gem provides the railtie that allows
 [sequel](http://github.com/jeremyevans/sequel) to hook into
-[Rails (3.x and 4.x)](http://github.com/rails/rails) and thus behave like a
+[Rails (5.2.x, 6.x, 7.x)](http://github.com/rails/rails) and thus behave like a
 rails framework component. Just like activerecord does in rails,
 [sequel-rails](http://github.com/talentbox/sequel-rails) uses the railtie API to
 hook into rails. The two are actually hooked into rails almost identically.
@@ -28,7 +27,7 @@ Since January 2013, we've become the official maintainers of the gem after
 Using sequel-rails
 ==================
 
-Using sequel with Rails (3.x or 4.x) requires a couple minor changes.
+Using sequel with Rails (5.2.x, 6.x, 7.x) requires a couple minor changes.
 
 First, add the following to your Gemfile (after the `Rails` lines):
 
@@ -51,10 +50,35 @@ The top of your `config/application.rb` will probably look something like:
 # require 'rails/all'
 
 # Instead of 'rails/all', require these:
-require "action_controller/railtie"
+require "active_model/railtie"
+require "active_job/railtie"
 # require "active_record/railtie"
+require "action_controller/railtie"
 require "action_mailer/railtie"
+require "action_view/railtie"
+require "action_cable/engine"
 require "sprockets/railtie"
+require "rails/test_unit/railtie"
+```
+
+Then you need to get rid of `ActiveRecord` configurations, that is if you
+didn't generate the new app with `-O` (or the long form `--skip-active-record`):
+
+For example in a fresh `Rails 5.0.0.1`, you would need to remove those lines:
+
+```
+config/initializers/new_framework_defaults.rb
+line 18:  Rails.application.config.active_record.belongs_to_required_by_default = true
+```
+
+```
+config/environments/development.rb
+line 38:  config.active_record.migration_error = :page_load
+```
+
+```
+config/environments/production.rb
+line 85:  config.active_record.dump_schema_after_migration = false
 ```
 
 Starting with sequel-rails 0.4.0.pre3 we don't change default Sequel behaviour
@@ -141,6 +165,9 @@ You can configure some options with the usual rails mechanism, in
     # Allowed options: :sql, :ruby.
     config.sequel.schema_format = :sql
 
+    # Allowed options: true, false, default false
+    config.sequel.allow_missing_migration_files = true
+
     # Whether to dump the schema after successful migrations.
     # Defaults to false in production and test, true otherwise.
     config.sequel.schema_dump = true
@@ -149,9 +176,37 @@ You can configure some options with the usual rails mechanism, in
     config.sequel.max_connections = 16
     config.sequel.search_path = %w(mine public)
 
-    # Configure whether database's rake tasks will be loaded or not
+    # Configure whether database's rake tasks will be loaded or not.
+    #
+    # If passed a String or Symbol, this will replace the `db:` namespace for
+    # the database's Rake tasks.
+    #
+    # ex: config.sequel.load_database_tasks = :sequel
+    #     will results in `rake db:migrate` to become `rake sequel:migrate`
+    #
     # Defaults to true
     config.sequel.load_database_tasks = false
+
+    # This setting disabled the automatic connect after Rails init
+    config.sequel.skip_connect = true
+
+    # Configure if Sequel should try to 'test' the database connection in order
+    # to fail early
+    config.sequel.test_connect = true
+
+    # Configure what should happend after SequelRails will create new connection with Sequel (applicable only for the first new connection)
+    # config.sequel.after_connect = proc do
+    #   Sequel::Model.plugin :timestamps, update_on_create: true
+    # end
+
+    # Configure what should happend after new connection in connection pool is created (applicable only for all connections)
+    # to fail early
+    # config.sequel.after_new_connection = proc do |db|
+    #   db.execute('SET statement_timeout = 30000;')
+    # end
+
+    # If you want to use a specific logger
+    config.sequel.logger = MyLogger.new($stdout)
 ```
 
 The connection settings are read from the file `config/database.yml` and is
@@ -208,11 +263,30 @@ Here's some examples:
 
   For in memory testing:
 
-    ```yaml
-    development:
+```yaml
+     development:
       adapter: sqlite # Also accept sqlite3
       database: ":memory:"
-    ```
+```
+
+after_connect hooks
+================
+
+There are 2 options how to set after_connect hooks in `config/application.rb`
+
+  1. `config.sequel.after_connect` will be called only on the first new connection. It can be used for enabling plugins or to set some global sequel settings.
+  ```ruby
+    config.sequel.after_connect = proc do
+      Sequel::Model.plugin :timestamps, update_on_create: true
+    end
+  ```
+
+  2. `config.sequel.after_new_connection` will be called after every new connection in connection pool is created. It can be used to run some specific `SET` commands on every new connection. It's using default `after_connect` hook in sequel. https://sequel.jeremyevans.net/rdoc/classes/Sequel/ConnectionPool.html#attribute-i-after_connect
+   ```ruby
+    config.sequel.after_new_connection = proc do |db|
+      db.execute('SET statement_timeout = 30000;')
+    end
+  ```
 
 Enabling plugins
 ================
@@ -295,6 +369,8 @@ rake db:schema:load                   # Load a schema.rb file into the database
 rake db:seed                          # Load the seed data from db/seeds.rb
 rake db:setup                         # Create the database, load the schema, and initialize with the seed data
 rake db:test:prepare                  # Prepare test database (ensure all migrations ran, drop and re-create database then load schema). This task can be run in the same invocation as other task (eg: rake db:migrate db:test:prepare).
+rake db:sessions:clear                # Delete all sessions from the database
+rake db:sessions:trim[threshold]      # Delete all sessions older than `threshold` days (default to 30 days, eg: rake db:session:trim[10])
 ```
 
 Note on Patches/Pull Requests
@@ -311,49 +387,77 @@ Note on Patches/Pull Requests
 The sequel-rails team
 =====================
 
-* Jonathan Tron (JonathanTron) - Current maintainer
-* Joseph Halter (JosephHalter) - Current maintainer
+* Jonathan Tron (@JonathanTron) - Current maintainer
+* Joseph Halter (@JosephHalter) - Current maintainer
 
 Previous maintainer
 ===================
 
 [Original project](https://github.com/brasten/sequel-rails):
 
-* Brasten Sager (brasten) - Project creator
+* Brasten Sager (@brasten) - Project creator
 
 Contributors
 ============
 
-Improvements has been made by those awesome contributors:
+Improvements have been made by those awesome contributors:
 
-* Benjamin Atkin (benatkin)
-* Gabor Ratky (rgabo)
-* Joshua Hansen (binarypaladin)
-* Arron Washington (radicaled)
-* Thiago Pradi (tchandy)
-* Sascha Cunz (scunz)
-* Brian Donovan (eventualbuddha)
-* Jack Danger Canty (JackDanger)
-* Ed Ruder (edruder)
-* Rafał Rzepecki (dividedmind)
-* Sean Sorrell (rudle)
-* Saulius Grigaliunas (sauliusg)
-* Jacques Crocker (railsjedi)
-* Eric Strathmeyer (strathmeyer)
-* Jan Berdajs (mrbrdo)
-* Robert Payne (robertjpayne)
-* Kevin Menard (nirvdrum)
-* Chris Heisterkamp (cheister)
-* Tamir Duberstein (tamird)
-* shelling (shelling)
-* a3gis (a3gis)
+* Benjamin Atkin (@benatkin)
+* Gabor Ratky (@rgabo)
+* Joshua Hansen (@binarypaladin)
+* Arron Washington (@radicaled)
+* Thiago Pradi (@tchandy)
+* Sascha Cunz (@scunz)
+* Brian Donovan (@eventualbuddha)
+* Jack Danger Canty (@JackDanger)
+* Ed Ruder (@edruder)
+* Rafał Rzepecki (@dividedmind)
+* Sean Sorrell (@rudle)
+* Saulius Grigaliunas (@sauliusg)
+* Jacques Crocker (@railsjedi)
+* Eric Strathmeyer (@strathmeyer)
+* Jan Berdajs (@mrbrdo)
+* Robert Payne (@robertjpayne)
+* Kevin Menard (@nirvdrum)
+* Chris Heisterkamp (@cheister)
+* Tamir Duberstein (@tamird)
+* shelling (@shelling)
+* a3gis (@a3gis)
+* Andrey Chernih (@andreychernih)
+* Nico Rieck (@gix)
+* Alexander Birkner (@BirknerAlex)
+* kr3ssh (@kressh)
+* John Anderson (@djellemah)
+* Larivact (@Larivact)
+* Jan Berdajs (@mrbrdo)
+* Lukas Fittl (@lfittl)
+* Jordan Owens (@jkowens)
+* Pablo Herrero (@pabloh)
+* Henre Botha (@henrebotha)
+* Mohammad Satrio (@tyok)
+* Gencer W. Genç (@gencer)
+* Steve Hoeksema (@steveh)
+* Jester (@Jesterovskiy)
+* ckoenig (@ckoenig)
+* Rolf Timmermans (@rolftimmermans)
+* Olivier Lacan (@olivierlacan)
+* Dustin Byrne (@dsbyrne)
+* Michael Coyne (@mjc-gh)
+* p-leger (@p-leger)
+* Semyon Pupkov (@artofhuman)
+* Ben Koshy (@BKSpurgeon)
+* Janko Marohnić (@janko)
+* Adrián Mugnolo (@xymbol)
+* Ivan (@AnotherRegularDude)
+* kamilpavlicko (@kamilpavlicko)
+* Stefan Vermaas (@stefanvermaas)
 
 Credits
 =======
 
-The [dm-rails](http://github.com/datamapper/dm-rails) team wrote most of the original code, I just sequel-ized it, but since then most of it as been either adapted or rewritten.
+The [dm-rails](http://github.com/datamapper/dm-rails) team wrote most of the original code, I just sequel-ized it, but since then most of it has been either adapted or rewritten.
 
 Copyright
 =========
 
-Copyright (c) 2010-2013 The sequel-rails team. See [LICENSE](http://github.com/brasten/sequel-rails/blob/master/LICENSE) for details.
+Copyright (c) 2010-2022 The sequel-rails team. See [LICENSE](http://github.com/TalentBox/sequel-rails/blob/master/LICENSE) for details.
