@@ -1,0 +1,8 @@
+title: Sequel-rails
+description: A gem for using Sequel with Rails 3.x and 4.x
+google_analytics: UA-44784988-1
+show_downloads: true
+theme: jekyll-theme-tactile
+
+gems:
+  - jekyll-mentions
