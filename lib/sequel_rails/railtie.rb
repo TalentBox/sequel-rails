@@ -116,7 +116,7 @@ module SequelRails
     end
 
     def database_create_command?
-      ['db:create', 'db:create:all'].any? { |c| ARGV.include?(c) }
+      ['db:create', 'db:create:all'].any? { |c| Rake.application.top_level_tasks.include?(c) }
     end
   end
 end
