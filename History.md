@@ -1,6 +1,8 @@
 Dev (unreleased)
 ================
 
+* Fix `rails db:create`/`rails db:create:all` (@tycooon)
+  [#190](https://github.com/TalentBox/sequel-rails/pull/190)
 * Update github pages (Stefan Vermaas)
   [#189](https://github.com/TalentBox/sequel-rails/pull/189)
 
