@@ -197,6 +197,8 @@ You can configure some options with the usual rails mechanism, in
     # Configure what should happend after SequelRails will create new connection with Sequel (applicable only for the first new connection)
     # config.sequel.after_connect = proc do
     #   Sequel::Model.plugin :timestamps, update_on_create: true
+    #   Sequel::Model.db.extension :pg_array, :pg_hstore # database specific extension
+    #   Sequel.extension :pg_hstore_ops # sequel specific extension
     # end
 
     # Configure what should happend after new connection in connection pool is created (applicable only for all connections)
@@ -278,6 +280,8 @@ There are 2 options how to set after_connect hooks in `config/application.rb`
   ```ruby
     config.sequel.after_connect = proc do
       Sequel::Model.plugin :timestamps, update_on_create: true
+      Sequel::Model.db.extension :pg_array, :pg_hstore # database specific extension
+      Sequel.extension :pg_hstore_ops # sequel specific extension
     end
   ```
 
