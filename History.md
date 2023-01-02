@@ -1,6 +1,8 @@
 Dev (unreleased)
 ================
 
+* Improve documentation about loading `Sequel` extensions (@elbouillon)
+  [#192](https://github.com/TalentBox/sequel-rails/pull/192)
 * Fix `rails db:create`/`rails db:create:all` (@tycooon)
   [#190](https://github.com/TalentBox/sequel-rails/pull/190)
 * Update github pages (Stefan Vermaas)
