@@ -457,6 +457,7 @@ Improvements have been made by those awesome contributors:
 * Stefan Vermaas (@stefanvermaas)
 * Yuri Smirnov (@tycooon)
 * Mickael Kurmann (@elbouillon)
+* Radoslaw Wojnarowski (@rwojnarowski)
 
 Credits
 =======

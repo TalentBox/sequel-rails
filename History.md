@@ -1,6 +1,8 @@
 Dev (unreleased)
 ================
 
+* Fix Rails 7.1 beta1 deprecation warning in log subscriber (@rwojnarowski)
+  [#196](https://github.com/TalentBox/sequel-rails/pull/196)
 * Improve documentation about loading `Sequel` extensions (@elbouillon)
   [#192](https://github.com/TalentBox/sequel-rails/pull/192)
 * Fix `rails db:create`/`rails db:create:all` (@tycooon)
