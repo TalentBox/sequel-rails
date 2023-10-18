@@ -58,8 +58,9 @@ The top of your `config/application.rb` will probably look something like:
   active_job/railtie
   rails/test_unit/railtie
 ).each do |railtie|
-  require railtie
-    rescue LoadError
+  begin
+    require railtie
+  rescue LoadError
   end
 end
 ```
@@ -96,6 +97,16 @@ require "sequel_rails/railties/legacy_model_config"
 Rake `db:*` mappings are currently not supported in Rails 7, so you'll need to use
 the `sequel:*` tasks instead. For example, to migrate your database, you'll need to
 run `rails sequel:migrate` instead of `rails db:migrate`.
+
+The rake command to create your db requires that Sequel does not attempt to connect
+to load models before creating the db. Add this to your `config/application.rb`
+
+```
+# config/application.rb
+if defined?(Rake.application)  && Rake.application.top_level_tasks.include?('sequel:create')
+  config.sequel.skip_connect = true
+end
+```
 
 After those changes, you should be good to go!
 

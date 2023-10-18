@@ -35,3 +35,4 @@ Gemfile.lock
 *.gemfile.lock
 
 spec/internal/db/database.sqlite3
+.idea/*
