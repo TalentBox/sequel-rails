@@ -1,3 +1,10 @@
+Dev (unreleased)
+================
+
+* Update instructions for Rails 7 (@opensourceame)
+  [#197](https://github.com/TalentBox/sequel-rails/pull/197)
+
+
 1.2.1 (2023-10-18)
 ==================
 
