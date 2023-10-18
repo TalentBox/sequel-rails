@@ -1,5 +1,5 @@
-Dev (unreleased)
-================
+1.2.1 (2023-10-18)
+==================
 
 * Fix Rails 7.1 beta1 deprecation warning in log subscriber (@rwojnarowski)
   [#196](https://github.com/TalentBox/sequel-rails/pull/196)
