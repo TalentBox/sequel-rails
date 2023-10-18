@@ -27,7 +27,7 @@ Since January 2013, we've become the official maintainers of the gem after
 Using sequel-rails
 ==================
 
-Using sequel with Rails (5.2.x, 6.x, 7.x) requires a couple minor changes.
+Using sequel with Rails (5.2.x, 6.x, 7.x) requires a few minor changes. 
 
 First, add the following to your Gemfile (after the `Rails` lines):
 
@@ -50,35 +50,36 @@ The top of your `config/application.rb` will probably look something like:
 # require 'rails/all'
 
 # Instead of 'rails/all', require these:
-require "active_model/railtie"
-require "active_job/railtie"
-# require "active_record/railtie"
-require "action_controller/railtie"
-require "action_mailer/railtie"
-require "action_view/railtie"
-require "action_cable/engine"
-require "sprockets/railtie"
-require "rails/test_unit/railtie"
+%w(
+  action_cable/engine
+  action_controller/railtie
+  action_mailer/railtie
+  action_view/railtie
+  active_job/railtie
+  rails/test_unit/railtie
+).each do |railtie|
+  require railtie
+    rescue LoadError
+  end
+end
 ```
 
-Then you need to get rid of `ActiveRecord` configurations, that is if you
+Then you need to get rid of `ActiveRecord` and `ActiveStorage` configurations, that is if you
 didn't generate the new app with `-O` (or the long form `--skip-active-record`):
 
-For example in a fresh `Rails 5.0.0.1`, you would need to remove those lines:
-
-```
-config/initializers/new_framework_defaults.rb
-line 18:  Rails.application.config.active_record.belongs_to_required_by_default = true
-```
+For example in a fresh `Rails 7`, you would need to remove those lines:
 
 ```
 config/environments/development.rb
-line 38:  config.active_record.migration_error = :page_load
+line 37:  # config.active_storage.service = :local
+line 54:  # config.active_record.migration_error = :page_load
+line 57:  # config.active_record.verbose_query_logs = true
 ```
 
 ```
 config/environments/production.rb
-line 85:  config.active_record.dump_schema_after_migration = false
+line 41:  # config.active_storage.service = :local
+line 92:  # config.active_record.dump_schema_after_migration = false
 ```
 
 Starting with sequel-rails 0.4.0.pre3 we don't change default Sequel behaviour
@@ -89,6 +90,12 @@ with content:
 ```ruby
 require "sequel_rails/railties/legacy_model_config"
 ```
+
+## Rails 7
+
+Rake `db:*` mappings are currently not supported in Rails 7, so you'll need to use
+the `sequel:*` tasks instead. For example, to migrate your database, you'll need to
+run `rails sequel:migrate` instead of `rails db:migrate`.
 
 After those changes, you should be good to go!
 
