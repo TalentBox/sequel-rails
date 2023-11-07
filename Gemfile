@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'actionpack'
-gem 'fakefs', '0.5.3', :require => 'fakefs/safe'
+gem 'fakefs', '>= 1.8.0', :require => 'fakefs/safe'
 
 gem 'pry'
 
