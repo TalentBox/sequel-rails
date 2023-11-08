@@ -6,5 +6,10 @@ end
 Bundler.require :default, :development, :test
 
 Combustion.path = ''
-Combustion.initialize! 'sequel_rails'
+Combustion.initialize! 'sequel_rails' do
+  if Rails.gem_version >= Gem::Version.new('7.1.0')
+    # Suppress warning about `cache_format_version`
+    config.active_support.cache_format_version = 7.1
+  end
+end
 Combustion::Application.load_tasks
