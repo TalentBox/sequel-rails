@@ -1,22 +1,27 @@
 source 'https://rubygems.org'
 
-gemspec
+gem 'railties', '~> 7.1.0'
+gem 'activemodel', '~> 7.1.0'
+gem 'actionpack', '~> 7.1.0'
 
-gem 'actionpack'
+gemspec :path => '../'
+
+gem 'sequel', "#{ENV['SEQUEL']}"
+
 gem 'fakefs', '>= 1.8.0', :require => 'fakefs/safe'
 
-gem 'pry'
+gem 'rspec-rails', '~> 5.0'
 
 # MRI/Rubinius Adapter Dependencies
 platform :ruby do
-  gem 'mysql2'
   gem 'pg'
+  gem 'mysql2'
   gem 'sqlite3'
 end
 
 # JRuby Adapter Dependencies
 platform :jruby do
+  gem 'jdbc-sqlite3'
   gem 'jdbc-mysql'
   gem 'jdbc-postgres'
-  gem 'jdbc-sqlite3'
 end

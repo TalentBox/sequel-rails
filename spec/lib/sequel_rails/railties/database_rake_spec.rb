@@ -25,28 +25,36 @@ describe 'Database rake tasks', :no_transaction => true do
     it 'append the migration schema information if any' do
       Dir.chdir app_root do
         `rake db:migrate db:schema:dump`
-        sql = Sequel::Model.db.from(
-          :schema_migrations
-        ).insert_sql(:filename => '1273253849_add_twitter_handle_to_users.rb')
+        sqls = [
+          Sequel::Model.db.from(
+            :schema_migrations
+          ).insert_sql(:filename => '1273253849_add_twitter_handle_to_users.rb'),
+          Sequel::Model.db.from(
+            :schema_migrations
+          ).insert_sql(:filename => '1365762738_add_display_name_to_users.rb'),
+          Sequel::Model.db.from(
+            :schema_migrations
+          ).insert_sql(:filename => '1365762739_add_github_username_to_users.rb')
+        ]
         content = if ENV['TEST_ADAPTER'] == 'postgresql'
-                    <<-EOS.strip_heredoc
+                    <<-EOS
                       Sequel.migration do
                         change do
                           self << "SET search_path TO \\"$user\\", public"
-                          self << #{sql.inspect}
+                          #{sqls.map { |sql| "self << #{sql.inspect}" }.join("\n")}
                         end
                       end
                     EOS
                   else
-                    <<-EOS.strip_heredoc
+                    <<-EOS
                       Sequel.migration do
                         change do
-                          self << #{sql.inspect}
+                          #{sqls.map { |sql| "self << #{sql.inspect}" }.join("\n")}
                         end
                       end
                     EOS
-                  end
-        expect(File.read(schema)).to include content
+                  end.gsub(/^\s+/, '').strip
+        expect(File.read(schema).gsub(/^\s+/, '')).to include content
       end
     end
   end
@@ -74,16 +82,77 @@ describe 'Database rake tasks', :no_transaction => true do
   end
 
   describe 'db:rollback' do
+    let(:version) { nil }
+    let(:rake_task_call) do
+      if version
+        proc { `rake db:rollback VERSION=#{version}` }
+      else
+        proc { `rake db:rollback` }
+      end
+    end
+
     it 'revert latest migration' do
       Dir.chdir app_root do
         begin
           expect do
-            `rake db:rollback`
+            rake_task_call.call
           end.to change { SequelRails::Migrations.current_migration }.from(
-            '1273253849_add_twitter_handle_to_users.rb'
-          ).to(nil)
+            '1365762739_add_github_username_to_users.rb'
+          ).to('1365762738_add_display_name_to_users.rb')
         ensure
           SequelRails::Migrations.migrate_up!
+        end
+      end
+    end
+
+    context 'when version supplied' do
+      context 'same as current version' do
+        let(:version) { '1365762739' }
+
+        it 'does not revert' do
+          Dir.chdir app_root do
+            begin
+              expect do
+                rake_task_call.call
+              end.not_to change { SequelRails::Migrations.current_migration }
+            ensure
+              SequelRails::Migrations.migrate_up!
+            end
+          end
+        end
+      end
+      context 'same as last version' do
+        let(:version) { '1365762738' }
+
+        it 'revert latest migration' do
+          Dir.chdir app_root do
+            begin
+              expect do
+                rake_task_call.call
+              end.to change { SequelRails::Migrations.current_migration }.from(
+                '1365762739_add_github_username_to_users.rb'
+              ).to('1365762738_add_display_name_to_users.rb')
+            ensure
+              SequelRails::Migrations.migrate_up!
+            end
+          end
+        end
+      end
+      context 'smaller than last version' do
+        let(:version) { '1273253849' }
+
+        it 'revert until migration specified by version' do
+          Dir.chdir app_root do
+            begin
+              expect do
+                rake_task_call.call
+              end.to change { SequelRails::Migrations.current_migration }.from(
+                '1365762739_add_github_username_to_users.rb'
+              ).to('1273253849_add_twitter_handle_to_users.rb')
+            ensure
+              SequelRails::Migrations.migrate_up!
+            end
+          end
         end
       end
     end
