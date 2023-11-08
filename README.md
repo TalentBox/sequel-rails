@@ -27,7 +27,7 @@ Since January 2013, we've become the official maintainers of the gem after
 Using sequel-rails
 ==================
 
-Using sequel with Rails (5.2.x, 6.x, 7.x) requires a few minor changes. 
+Using sequel with Rails (5.2.x, 6.x, 7.x) requires a few minor changes.
 
 First, add the following to your Gemfile (after the `Rails` lines):
 
@@ -477,6 +477,7 @@ Improvements have been made by those awesome contributors:
 * Mickael Kurmann (@elbouillon)
 * Radoslaw Wojnarowski (@rwojnarowski)
 * David Kelly (@opensourceame)
+* PikachuEXE (@PikachuEXE)
 
 Credits
 =======

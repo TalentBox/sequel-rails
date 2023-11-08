@@ -1,6 +1,8 @@
 Dev (unreleased)
 ================
 
+* Update CI to run against rails 7.1 & ruby 3.2, add spec for `db:rollback` (@PikachuEXE)
+  [#199](https://github.com/TalentBox/sequel-rails/pull/199)
 * Update instructions for Rails 7 (@opensourceame)
   [#197](https://github.com/TalentBox/sequel-rails/pull/197)
 
