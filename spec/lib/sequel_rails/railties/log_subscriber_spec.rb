@@ -24,7 +24,7 @@ describe SequelRails::Railties::LogSubscriber do
 
   it 'does not log query when logger level is not debug, but track runtime and count' do
     expect(described_class.count).to eq 0
-    @logger.level = :info
+    @logger.level = defined?(Logger::Severity) ? Logger::Severity::INFO : :info
     User.all
     wait
     expect(@logger.logged(:debug).size).to eq 0
