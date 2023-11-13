@@ -105,6 +105,8 @@ module SequelRails
 
     private
 
+    # This is overriding parent method, no way to choose another method name
+    # rubocop:disable Naming/AccessorMethodName
     def get_migration_tuples
       up_mts = []
       down_mts = []
@@ -127,5 +129,6 @@ module SequelRails
       end
       up_mts + down_mts.reverse
     end
+    # rubocop:enable Naming/AccessorMethodName
   end
 end
