@@ -1,5 +1,5 @@
-Dev (unreleased)
-================
+1.2.2 (2023-12-18)
+==================
 
 * Simplify `binds` handling in `LogSubscriber` to support bound variables and prepare statements (Jonathan Tron)
   [#201](https://github.com/TalentBox/sequel-rails/pull/201)
