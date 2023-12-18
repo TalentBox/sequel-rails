@@ -30,4 +30,23 @@ describe SequelRails::Railties::LogSubscriber do
     expect(@logger.logged(:debug).size).to eq 0
     expect(described_class.count).to be > 0
   end
+
+  it 'works with bound variables' do
+    ds = Sequel::Model.db[:users].where(:id => :$id)
+    ds.call(:select, :id => 1)
+    expect(@logger.logged(:debug).last).to match(
+      /SELECT \* FROM "users" WHERE \("id" = \$1\) \[1\]/
+    )
+  end
+
+  it 'works with prepared statements' do
+    ds = Sequel::Model.db[:users].where(:id => :$id).prepare(:select, :users_by_id)
+    ds.call(:id => 1)
+    expect(@logger.logged(:debug)[-2]).to match(
+      /PREPARE users_by_id AS SELECT \* FROM "users" WHERE \("id" = \$1\)/
+    )
+    expect(@logger.logged(:debug)[-1]).to match(
+      /EXECUTE users_by_id \[1\]/
+    )
+  end
 end

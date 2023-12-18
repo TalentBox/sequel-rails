@@ -38,13 +38,7 @@ module SequelRails
 
         name = format('%s (%.1fms)', payload[:name], event.duration)
         sql  = payload[:sql].squeeze(' ')
-        binds = nil
-
-        unless (payload[:binds] || []).empty?
-          binds = '  ' + payload[:binds].map do |col, v|
-            [col.name, v]
-          end.inspect
-        end
+        binds = " #{payload[:binds].inspect}" unless (payload[:binds] || []).empty?
 
         if odd?
           name = color(name, :cyan, :bold => true)
