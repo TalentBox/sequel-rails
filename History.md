@@ -1,3 +1,9 @@
+Dev
+===
+
+* Update CI to run on Ruby 3.3 (@PikachuEXE)
+  [#202](https://github.com/TalentBox/sequel-rails/pull/202)
+
 1.2.2 (2023-12-18)
 ==================
 
