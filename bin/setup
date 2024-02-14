@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+puts "Installing development dependencies..."
+system!("bundle install")
+
+puts "Creating local databases for tests..."
+
+if ARGV.include?("--mysql-user")
+  mysql_user = "-u #{ARGV[ARGV.index("--mysql-user").next]}"
+end
+
+system!("mysql #{mysql_user} -e 'CREATE DATABASE IF NOT EXISTS sequel_rails_test;'")
+system!("mysql #{mysql_user} -e 'CREATE DATABASE IF NOT EXISTS sequel_rails_test_mysql2;'")
+system!("mysql #{mysql_user} -e 'CREATE DATABASE IF NOT EXISTS sequel_rails_test_storage_dev;'")
+system!("createdb sequel_rails_test_storage_dev")
+system!("createdb sequel_rails_test")
+
