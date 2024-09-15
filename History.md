@@ -1,5 +1,9 @@
-Dev
+dev
 ===
+
+
+1.2.3 (2024-09-15)
+==================
 
 * Allow to use commands db:test:prepare, db:setup without created DB (@artofhuman)
   [#203](https://github.com/TalentBox/sequel-rails/pull/203)
