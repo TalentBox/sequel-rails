@@ -1,6 +1,8 @@
 Dev
 ===
 
+* Allow to use commands db:test:prepare, db:setup without created DB (@artofhuman)
+  [#203](https://github.com/TalentBox/sequel-rails/pull/203)
 * Update CI to run on Ruby 3.3 (@PikachuEXE)
   [#202](https://github.com/TalentBox/sequel-rails/pull/202)
 
