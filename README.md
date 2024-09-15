@@ -377,7 +377,7 @@ Once you do that, you will see the following rake tasks among others. These are 
 ```bash
 rake db:create[env]                   # Create the database defined in config/database.yml for the current Rails.env
 rake db:create:all                    # Create all the local databases defined in config/database.yml
-rake db:drop[env]                     # Create the database defined in config/database.yml for the current Rails.env
+rake db:drop[env]                     # Drop the database defined in config/database.yml for the current Rails.env
 rake db:drop:all                      # Drops all the local databases defined in config/database.yml
 rake db:force_close_open_connections  # Forcibly close any open connections to the test database
 rake db:migrate                       # Migrate the database to the latest version
