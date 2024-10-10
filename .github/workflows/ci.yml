@@ -80,6 +80,10 @@ jobs:
             rails: "7.1"
           - ruby: "2.6"
             rails: "7.2"
+          - ruby: "2.7"
+            rails: "7.2"
+          - ruby: "3.0"
+            rails: "7.2"
           - ruby: "jruby"
             rails: "7.2"
     name: Rails ${{ matrix.rails }}, Sequel ${{ matrix.sequel }}, Ruby ${{ matrix.ruby }}
