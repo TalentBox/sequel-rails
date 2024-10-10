@@ -42,6 +42,7 @@ jobs:
           - "6.1"
           - "7.0"
           - "7.1"
+          - "7.2"
         sequel:
           - "~> 5.0"
         ruby:
@@ -77,6 +78,10 @@ jobs:
             rails: "7.1"
           - ruby: "jruby"
             rails: "7.1"
+          - ruby: "2.6"
+            rails: "7.2"
+          - ruby: "jruby"
+            rails: "7.2"
     name: Rails ${{ matrix.rails }}, Sequel ${{ matrix.sequel }}, Ruby ${{ matrix.ruby }}
 
     env:
