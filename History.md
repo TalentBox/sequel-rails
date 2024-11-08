@@ -1,6 +1,7 @@
 dev
 ===
 
+* Configure CI to include tests for Rails ~> 8.0.0 (Jonathan Tron)
 
 1.2.3 (2024-09-15)
 ==================
