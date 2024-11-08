@@ -16,11 +16,7 @@ gem 'rspec-rails', '~> 5.0'
 platform :ruby do
   gem 'pg'
   gem 'mysql2'
-  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.0")
-    gem 'sqlite3', '~> 1.6.9'
-  else
-    gem 'sqlite3'
-  end
+  gem 'sqlite3'
 end
 
 # JRuby Adapter Dependencies
