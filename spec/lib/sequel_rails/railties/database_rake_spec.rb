@@ -81,6 +81,219 @@ describe 'Database rake tasks', :no_transaction => true do
     end
   end
 
+  describe 'db:migrate:up' do
+    let(:version) { nil }
+    around do |example|
+      env_value_before = ENV['VERSION']
+      ENV['VERSION'] = version
+      example.run
+      ENV['VERSION'] = env_value_before
+    end
+    let(:rake_task_call) do
+      proc { Rake::Task['db:migrate:up'].execute }
+    end
+
+    context 'when no version supplied' do
+      it 'raises error' do
+        Dir.chdir app_root do
+          begin
+            expect do
+              rake_task_call.call
+            end.to raise_error('VERSION is required')
+          ensure
+            SequelRails::Migrations.migrate_up!
+          end
+        end
+      end
+    end
+
+    context 'when version with no matching migration supplied' do
+      let(:version) { '1273253848' }
+
+      it 'raises error' do
+        Dir.chdir app_root do
+          begin
+            expect do
+              rake_task_call.call
+            end.to raise_error("Migration with version #{version} not found")
+          ensure
+            SequelRails::Migrations.migrate_up!
+          end
+        end
+      end
+    end
+
+    context 'when version with matching migration supplied' do
+      let(:version) { '1273253849' }
+
+      context 'and migration already run' do
+        it 'raises error' do
+          Dir.chdir app_root do
+            begin
+              expect do
+                rake_task_call.call
+              end.to raise_error("Migration with version #{version} is already migrated/rollback")
+            ensure
+              SequelRails::Migrations.migrate_up!
+            end
+          end
+        end
+      end
+
+      context 'and migration NOT already run' do
+        context 'and target migration is 1 version later than current migration' do
+          before do
+            Dir.chdir app_root do
+              SequelRails::Migrations.migrate_down!(0)
+            end
+          end
+
+          it 'runs the matching migration ONLY' do
+            Dir.chdir app_root do
+              begin
+                expect do
+                  rake_task_call.call
+                end.to change { SequelRails::Migrations.current_migration }
+                  .from(nil)
+                  .to('1273253849_add_twitter_handle_to_users.rb')
+              ensure
+                SequelRails::Migrations.migrate_up!
+              end
+            end
+          end
+        end
+
+        context 'and target migration is > 1 version later than current migration' do
+          let(:version) { '1365762739' }
+          before do
+            Dir.chdir app_root do
+              SequelRails::Migrations.migrate_down!(0)
+            end
+          end
+
+          it 'runs the matching migration ONLY' do
+            Dir.chdir app_root do
+              begin
+                expect do
+                  rake_task_call.call
+                end.to change {
+                  {
+                    current_migration: SequelRails::Migrations.current_migration,
+                    previous_migration: SequelRails::Migrations.previous_migration
+                  }
+                }
+                  .from({
+                    current_migration: nil,
+                    previous_migration: '0'
+                  })
+                  .to({
+                    current_migration: '1365762739_add_github_username_to_users.rb',
+                    previous_migration: '0'
+                  })
+              ensure
+                SequelRails::Migrations.migrate_up!
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+
+  describe 'db:migrate:down' do
+    let(:version) { nil }
+    around do |example|
+      env_value_before = ENV['VERSION']
+      ENV['VERSION'] = version
+      example.run
+      ENV['VERSION'] = env_value_before
+    end
+    let(:rake_task_call) do
+      proc { Rake::Task['db:migrate:down'].execute }
+    end
+
+    context 'when no version supplied' do
+      it 'raises error' do
+        Dir.chdir app_root do
+          begin
+            expect do
+              rake_task_call.call
+            end.to raise_error('VERSION is required')
+          ensure
+            SequelRails::Migrations.migrate_up!
+          end
+        end
+      end
+    end
+
+    context 'when version with no matching migration supplied' do
+      let(:version) { '1273253848' }
+
+      it 'raises error' do
+        Dir.chdir app_root do
+          begin
+            expect do
+              rake_task_call.call
+            end.to raise_error("Migration with version #{version} not found")
+          ensure
+            SequelRails::Migrations.migrate_up!
+          end
+        end
+      end
+    end
+
+    context 'when version with matching migration supplied' do
+      let(:version) { '1365762738' }
+
+      context 'and migration already run' do
+        it 'reverts the matching migration ONLY' do
+          Dir.chdir app_root do
+            begin
+              expect do
+                rake_task_call.call
+              end.to change {
+                {
+                  current_migration: SequelRails::Migrations.current_migration,
+                  previous_migration: SequelRails::Migrations.previous_migration
+                }
+              }
+                .from({
+                  current_migration: '1365762739_add_github_username_to_users.rb',
+                  previous_migration: '1365762738_add_display_name_to_users.rb'
+                })
+                .to({
+                  current_migration: '1365762739_add_github_username_to_users.rb',
+                  previous_migration: '1273253849_add_twitter_handle_to_users.rb'
+                })
+            ensure
+              SequelRails::Migrations.migrate_up!
+            end
+          end
+        end
+      end
+
+      context 'and migration NOT already run' do
+        before do
+          Dir.chdir app_root do
+            SequelRails::Migrations.migrate_down!(0)
+          end
+        end
+
+        it 'raises error' do
+          Dir.chdir app_root do
+            begin
+              expect do
+                rake_task_call.call
+              end.to raise_error("Migration with version #{version} is already migrated/rollback")
+            ensure
+              SequelRails::Migrations.migrate_up!
+            end
+          end
+        end
+      end
+    end
+  end
+
   describe 'db:rollback' do
     let(:version) { nil }
     let(:rake_task_call) do
