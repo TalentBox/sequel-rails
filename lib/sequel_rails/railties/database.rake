@@ -206,6 +206,7 @@ namespace sequel_rails_namespace do
     desc "Prepare test database (ensure all migrations ran, drop and re-create database then load schema). This task can be run in the same invocation as other task (eg: rake #{sequel_rails_namespace}:migrate #{sequel_rails_namespace}:test:prepare)."
     task :prepare => "#{sequel_rails_namespace}:abort_if_pending_migrations" do
       previous_env, Rails.env = Rails.env, 'test'
+      Sequel::DATABASES.each(&:disconnect)
       Rake::Task["#{sequel_rails_namespace}:drop"].execute
       Rake::Task["#{sequel_rails_namespace}:create"].execute
       Rake::Task["#{sequel_rails_namespace}:load"].execute
