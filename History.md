@@ -1,5 +1,5 @@
-dev
-===
+1.2.4 (2025-03-06)
+==================
 
 * Disconnect database connections before attempting to drop database (@rolftimmermans)
   [#204](https://github.com/TalentBox/sequel-rails/pull/204)
