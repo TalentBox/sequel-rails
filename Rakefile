@@ -1,3 +1,6 @@
+# So loading rails via combustion doesn't crash on some older versions
+require 'logger'
+
 begin
   require 'bundler/setup'
 rescue LoadError

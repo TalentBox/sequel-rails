@@ -1,8 +1,12 @@
+# So loading rails via combustion doesn't crash on some older versions
+require 'logger'
+
 begin
   require 'bundler/setup'
 rescue LoadError
   warn 'You must `gem install bundler` and `bundle install` to run rake tasks'
 end
+
 Bundler.require :default, :development, :test
 
 Combustion.path = ''
