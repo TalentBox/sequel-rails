@@ -105,6 +105,7 @@ module SequelRails
     def setup_controller_runtime
       require 'sequel_rails/railties/controller_runtime'
       ActionController::Base.send :include, SequelRails::Railties::ControllerRuntime
+      ActionController::API.send :include, SequelRails::Railties::ControllerRuntime
     end
 
     def check_skip_connect_conditions(app)
