@@ -1,3 +1,9 @@
+dev
+===
+
+* Include ControllerRuntime in ActionController::API (@rolftimmermans)
+  [#205](https://github.com/TalentBox/sequel-rails/pull/205)
+
 1.2.4 (2025-03-06)
 ==================
 
