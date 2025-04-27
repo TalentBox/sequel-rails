@@ -8,6 +8,8 @@ Bundler.require :default, :development, :test
 
 # Combustion initialization has to happen before loading rspec/rails
 Combustion.initialize! :sequel_rails
+# Load rake tasks
+Combustion::Application.load_tasks
 
 require 'rspec/rails'
 require 'ammeter/init'
